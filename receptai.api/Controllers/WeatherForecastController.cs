@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using receptai.data;
 
 namespace receptai.api.Controllers;
 
@@ -12,15 +13,23 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    private readonly RecipePlatformDbContext _db;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, RecipePlatformDbContext db)
     {
         _logger = logger;
+        _db = db;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
+        Image a = new()
+        {
+            ImageData = []
+        };
+        _db.Images.Add(a);
+        _db.SaveChanges();
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
