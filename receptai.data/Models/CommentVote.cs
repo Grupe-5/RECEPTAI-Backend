@@ -4,19 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace receptai.data;
 
-public enum VoteType {
-    Upvote, Downvote
-};
-
-public class Vote
+public class CommentVote
 {
         [Column(Order = 0)]
         [ForeignKey("User")]
         public int UserId { get; set; }
 
         [Column(Order = 1)]
-        [ForeignKey("Recipe")]
-        public int RecipeId { get; set; }
+        [ForeignKey("Comment")]
+        public int CommentId { get; set; }
 
         [Required]
         public VoteType VoteType { get; set; }
@@ -25,5 +21,5 @@ public class Vote
         public DateTime VoteDate { get; set; }
 
         public virtual User User { get; set; }
-        public virtual Recipe Recipe { get; set; }
+        public virtual Comment Comment { get; set; }
 }
