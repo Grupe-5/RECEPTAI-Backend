@@ -26,4 +26,5 @@ public class Comment
 
     public virtual Recipe Recipe { get; set; }
     public virtual User User { get; set; }
+    public virtual ICollection<CommentVote> Votes { get; set; }
 }

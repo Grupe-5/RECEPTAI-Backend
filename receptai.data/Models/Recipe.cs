@@ -44,5 +44,5 @@ public class Recipe
     public virtual Image? Image { get; set; }
     public virtual Subreddit Subreddit { get; set; }
     public virtual ICollection<Comment> Comments { get; set; }
-    public virtual ICollection<Vote> Votes { get; set; }
+    public virtual ICollection<RecipeVote> Votes { get; set; }
 }

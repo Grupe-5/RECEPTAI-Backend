@@ -26,6 +26,7 @@ public class User
 
         public virtual ICollection<Recipe> Recipes { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
-        public virtual ICollection<Vote> Votes { get; set; }
+        public virtual ICollection<RecipeVote> RecipeVotes { get; set; }
+        public virtual ICollection<CommentVote> CommentVotes { get; set; }
         public virtual ICollection<Subreddit> Subreddits { get; set; }
 }
