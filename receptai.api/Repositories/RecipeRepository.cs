@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using receptai.api.Dtos.Recipe;
+using receptai.api.Helpers;
 using receptai.api.Interfaces;
 using receptai.data;
 
@@ -38,9 +39,23 @@ public class RecipeRepository : IRecipeRepository
         return recipeModel;
     }
 
-    public async Task<List<Recipe>> GetAllAsync()
+    public async Task<List<Recipe>> GetAllAsync(QueryRecipe query)
     {
-        return await _context.Recipes.ToListAsync();
+        var recipes = _context.Recipes.AsQueryable();
+
+        // Filter by UserId if provided
+        if (query.UserId.HasValue)
+        {
+            recipes = recipes.Where(r => r.UserId == query.UserId.Value);
+        }
+
+        // Filter by SubfoodditId if provided
+        if (query.SubfoodditId.HasValue)
+        {
+            recipes = recipes.Where(r => r.SubfoodditId == query.SubfoodditId.Value);
+        }
+
+        return await recipes.ToListAsync();
     }
 
     public async Task<Recipe?> GetByIdAsync(int id)

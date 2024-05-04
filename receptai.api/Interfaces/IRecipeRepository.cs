@@ -1,11 +1,13 @@
 ﻿using receptai.api.Dtos.Recipe;
+using receptai.api.Helpers;
 using receptai.data;
 
 namespace receptai.api.Interfaces;
 
 public interface IRecipeRepository
 {
-    Task<List<Recipe>> GetAllAsync();
+    Task<List<Recipe>> GetAllAsync(
+        QueryRecipe query);
 
     Task<Recipe?> GetByIdAsync(int id);
 
