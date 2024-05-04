@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using receptai.api.Interfaces;
+using receptai.api.Repositories;
 using receptai.data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +12,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<RecipePlatformDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("SQLite")));
+builder.Services.AddDbContext<RecipePlatformDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("SQLite")));
+
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 
 var app = builder.Build();
 

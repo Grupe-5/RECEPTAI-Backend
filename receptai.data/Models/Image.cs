@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace receptai.data;
 
@@ -10,5 +9,5 @@ public class Image
     public int ImgId { get; set; }
 
     [Required]
-    public byte[] ImageData { get; set; }
+    public byte[] ImageData { get; set; } = null!;
 }

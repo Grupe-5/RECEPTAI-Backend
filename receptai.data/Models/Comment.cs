@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace receptai.data;
@@ -18,13 +17,13 @@ public class Comment
     public int UserId { get; set; }
 
     [Required]
-    [StringLength(5000)]
-    public string CommentText { get; set; }
+    [StringLength(1000)]
+    public string CommentText { get; set; } = null!;
 
     [Required]
-    public DateTime CommentDate { get; set; }
+    public DateTime CommentDate { get; set; } = DateTime.Now;
 
-    public virtual Recipe Recipe { get; set; }
-    public virtual User User { get; set; }
-    public virtual ICollection<CommentVote> Votes { get; set; }
+    public virtual Recipe Recipe { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
+    public virtual ICollection<CommentVote>? Votes { get; set; }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace receptai.data;
@@ -16,33 +14,39 @@ public class Recipe
 
     [Required]
     [StringLength(255)]
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
 
     [ForeignKey("Image")]
     public int? ImgId { get; set; }
 
     [Required]
-    [ForeignKey("Subreddit")]
-    public int SubredditId { get; set; }
+    [ForeignKey("Subfooddit")]
+    public int SubfoodditId { get; set; }
 
-    public string Ingredients { get; set; }
+    [Required]
+    public string Ingredients { get; set; } = null!;
 
     [StringLength(5000)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public string CookingTime { get; set; }
+    public string? CookingTime { get; set; }
 
+    [Range(1, int.MaxValue)]
     public int Servings { get; set; }
 
-    public DateTime DatePosted { get; set; }
+    [Required]
+    public DateTime DatePosted { get; set; } = DateTime.Now;
 
-    public string CookingDifficulty { get; set; }
+    [Range(1, 10, ErrorMessage = 
+        "Difficulty must be rated between 1 and 10!")]
+    public int CookingDifficulty { get; set; }
 
-    public string Instructions { get; set; }
+    [Required]
+    public string? Instructions { get; set; }
 
-    public virtual User User { get; set; }
+    public virtual User User { get; set; } = null!;
     public virtual Image? Image { get; set; }
-    public virtual Subreddit Subreddit { get; set; }
-    public virtual ICollection<Comment> Comments { get; set; }
-    public virtual ICollection<RecipeVote> Votes { get; set; }
+    public virtual Subfooddit Subfooddit { get; set; } = null!;
+    public virtual ICollection<Comment>? Comments { get; set; }
+    public virtual ICollection<RecipeVote>? Votes { get; set; }
 }
