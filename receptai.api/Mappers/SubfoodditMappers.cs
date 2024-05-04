@@ -24,7 +24,6 @@ public static class SubfoodditMappers
             Title = subfoodditModel.Title,
             Description = subfoodditModel.Description,
             CreationDate = subfoodditModel.CreationDate,
-
         };
     }
 }
