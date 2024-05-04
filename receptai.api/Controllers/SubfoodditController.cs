@@ -22,10 +22,10 @@ public class SubfoodditController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAll(
-    [FromQuery] QuerySubfooddit query)
+        [FromQuery] QuerySubfooddit query)
     {
         var subfooddits = await _subfoodditRepository.GetAllAsync(query);
-        var subfoodditDto = subfooddits.Select(r => r.ToSubfoodditDto());
+        var subfoodditDto = subfooddits.Select(s => s.ToSubfoodditDto());
 
         return Ok(subfoodditDto);
     }
@@ -45,7 +45,7 @@ public class SubfoodditController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> Create(
-    [FromBody] CreateSubfoodditRequestDto subfoodditDto)
+        [FromBody] CreateSubfoodditRequestDto subfoodditDto)
     {
         if (!ModelState.IsValid)
         {
@@ -57,13 +57,13 @@ public class SubfoodditController : ControllerBase
 
         return CreatedAtAction(nameof(GetById),
             new { id = subfoodditModel.SubfoodditId },
-           subfoodditModel.ToSubfoodditDto());
+            subfoodditModel.ToSubfoodditDto());
     }
 
     [HttpPut]
     [Route("{id:int}")]
     public async Task<IActionResult> Update([FromRoute] int id,
-    [FromBody] UpdateSubfoodditRequestDto subfoodditDto)
+        [FromBody] UpdateSubfoodditRequestDto subfoodditDto)
     {
         if (!ModelState.IsValid)
         {
@@ -77,7 +77,6 @@ public class SubfoodditController : ControllerBase
         {
             return NotFound();
         }
-
 
         return Ok(subfoodditModel.ToSubfoodditDto());
     }

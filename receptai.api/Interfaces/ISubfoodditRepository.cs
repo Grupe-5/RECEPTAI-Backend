@@ -7,7 +7,7 @@ namespace receptai.api.Interfaces;
 public interface ISubfoodditRepository
 {
     Task<List<Subfooddit>> GetAllAsync(
-    QuerySubfooddit query);
+        QuerySubfooddit query);
 
     Task<Subfooddit?> GetByIdAsync(int id);
 

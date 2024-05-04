@@ -27,7 +27,7 @@ public class SubfoodditRepository : ISubfoodditRepository
     public async Task<Subfooddit?> DeleteAsync(int id)
     {
         var subfoodditModel = await _context.Subfooddits
-            .FirstOrDefaultAsync(r => r.SubfoodditId == id);
+            .FirstOrDefaultAsync(s => s.SubfoodditId == id);
 
         if (subfoodditModel is null)
         {
@@ -51,7 +51,6 @@ public class SubfoodditRepository : ISubfoodditRepository
             //TODO subfooddits = subfooddits.Where(r => r.UserId == query.UserId.Value);
         }
 
-
         return await subfooddits.ToListAsync();
     }
 
@@ -61,10 +60,10 @@ public class SubfoodditRepository : ISubfoodditRepository
     }
 
     public async Task<Subfooddit?> UpdateAsync(int id,
-    UpdateSubfoodditRequestDto subfoodditDto)
+        UpdateSubfoodditRequestDto subfoodditDto)
     {
         var existingSubfooddit = await _context.Subfooddits
-            .FirstOrDefaultAsync(x => x.SubfoodditId == id);
+            .FirstOrDefaultAsync(xs => xs.SubfoodditId == id);
 
         if (existingSubfooddit is null)
         {
@@ -74,7 +73,6 @@ public class SubfoodditRepository : ISubfoodditRepository
         existingSubfooddit.Title = subfoodditDto.Title;
         existingSubfooddit.Description = subfoodditDto.Description;
         existingSubfooddit.CreationDate = subfoodditDto.CreationDate;
-
 
         await _context.SaveChangesAsync();
 
