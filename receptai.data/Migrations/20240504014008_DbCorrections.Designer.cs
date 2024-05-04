@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using receptai.data;
 
@@ -10,9 +11,11 @@ using receptai.data;
 namespace receptai.data.Migrations
 {
     [DbContext(typeof(RecipePlatformDbContext))]
-    partial class RecipePlatformDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240504014008_DbCorrections")]
+    partial class DbCorrections
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
