@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using receptai.api.Dtos.Recipe;
+using receptai.api.Helpers;
 using receptai.api.Interfaces;
 using receptai.api.Mappers;
 using receptai.data;
@@ -11,46 +12,24 @@ namespace receptai.api.Controllers;
 [ApiController]
 public class RecipeController : ControllerBase
 {
-    private readonly RecipePlatformDbContext _context;
     private readonly IRecipeRepository _recipeRepository;
 
-    public RecipeController(RecipePlatformDbContext context,
-        IRecipeRepository recipeRepository)
+    public RecipeController(IRecipeRepository recipeRepository)
     {
-        _context = context;
         _recipeRepository = recipeRepository;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int? userId,
-        [FromQuery] int? subfoodditId)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] QueryRecipe query)
     {
-        var recipes = await _recipeRepository.GetAllAsync();
+        var recipes = await _recipeRepository.GetAllAsync(query);
         var recipeDto = recipes.Select(r => r.ToRecipeDto());
-
-        if (userId.HasValue)
-        {
-            recipeDto = recipeDto
-                .Where(r => r.UserId == userId.Value);
-        }
-
-        if (subfoodditId.HasValue)
-        {
-            recipeDto = recipeDto
-                .Where(r => r.SubfoodditId == subfoodditId.Value);
-        }
-
-        var filteredRecipes = recipeDto.ToList();
-
-        if(filteredRecipes.Count == 0)
-        {
-            return NotFound($"No recipes found matching the given filters.");
-        }
 
         return Ok(recipeDto);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var recipe = await _recipeRepository.GetByIdAsync(id);
@@ -67,6 +46,11 @@ public class RecipeController : ControllerBase
     public async Task<IActionResult> Create(
         [FromBody] CreateRecipeRequestDto recipeDto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         var recipeModel = recipeDto.ToRecipeFromCreateDto();
         await _recipeRepository.CreateAsync(recipeModel);
 
@@ -76,10 +60,15 @@ public class RecipeController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{id}")]
+    [Route("{id:int}")]
     public async Task<IActionResult> Update([FromRoute] int id,
         [FromBody] UpdateRecipeRequestDto recipeDto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         var recipeModel = await _recipeRepository
             .UpdateAsync(id, recipeDto);
 
@@ -92,7 +81,7 @@ public class RecipeController : ControllerBase
     }
 
     [HttpDelete]
-    [Route("{id}")]
+    [Route("{id:int}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var recipeModel = await _recipeRepository.DeleteAsync(id);

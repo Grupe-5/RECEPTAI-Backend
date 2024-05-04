@@ -37,8 +37,7 @@ public class Recipe
     [Required]
     public DateTime DatePosted { get; set; } = DateTime.Now;
 
-    [Range(1, 10, ErrorMessage = 
-        "Difficulty must be rated between 1 and 10!")]
+    [Range(1, 10)]
     public int CookingDifficulty { get; set; }
 
     [Required]
