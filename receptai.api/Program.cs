@@ -17,6 +17,7 @@ builder.Services.AddDbContext<RecipePlatformDbContext>(options =>
 
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<ISubfoodditRepository, SubfoodditRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 var app = builder.Build();
 
