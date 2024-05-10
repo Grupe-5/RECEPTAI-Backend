@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+receptai.api/sqlite.db
+receptai.api/sqlite.db-shm
+receptai.api/sqlite.db-wal
