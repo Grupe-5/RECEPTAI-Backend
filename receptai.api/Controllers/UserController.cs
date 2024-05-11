@@ -1,4 +1,5 @@
 using api.Dtos.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -98,6 +99,65 @@ public class UserController(UserManager<User> userManager, ITokenService tokenSe
             }
         );
     }
+
+    [HttpDelete("delete_account")]
+    [Authorize]
+    public async Task<IActionResult> DeleteUser()
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) {
+            return NotFound();
+        }
+
+        var res = await _userManager.DeleteAsync(user);
+        if (res.Succeeded) {
+            return Ok();
+        } else {
+            return BadRequest(res.Errors);
+        }
+    }
+
+    [HttpGet("info/me")]
+    [Authorize]
+    public async Task<IActionResult> GetCurrentUserInfo()
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        /* If some private data is required, this endpoint can return more than generic one */
+        return Ok(user.ToUserInfoDto());
+    }
+
+    [HttpGet("info/{id:int}")]
+    public async Task<IActionResult> GetUserInfo([FromRoute] int id)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user.ToUserInfoDto());
+    }
+
     [HttpPost("img")]
     [Authorize]
     public async Task<IActionResult> UploadUserImg(IFormFile file)
