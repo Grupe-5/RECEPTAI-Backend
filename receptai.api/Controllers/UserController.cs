@@ -12,17 +12,14 @@ namespace receptai.api.Controllers;
 
 [Route("api/user")]
 [ApiController]
-public class UserController : ControllerBase
+public class UserController(UserManager<User> userManager, ITokenService tokenService, SignInManager<User> signInManager, IImageService imageService) : ControllerBase
 {
-    private readonly UserManager<User> _userManager;
-    private readonly ITokenService _tokenService;
-    private readonly SignInManager<User> _signInManager;
-    public UserController(UserManager<User> userManager, ITokenService tokenService, SignInManager<User> signInManager)
-    {
-        _userManager = userManager;
-        _tokenService = tokenService;
-        _signInManager = signInManager;
-    }
+    private readonly UserManager<User> _userManager = userManager;
+    private readonly ITokenService _tokenService = tokenService;
+    private readonly SignInManager<User> _signInManager = signInManager;
+    private readonly IImageService _imageService = imageService;
+    private readonly string[] _allowedExtensions = [".jpg", ".jpeg", ".png", ".bmp"];
+    private readonly string[] _allowedContentTypes = ["image/jpeg", "image/png", "image/bmp"];
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
@@ -100,5 +97,80 @@ public class UserController : ControllerBase
                 Token = _tokenService.CreateToken(user)
             }
         );
+    }
+    [HttpPost("img")]
+    [Authorize]
+    public async Task<IActionResult> UploadUserImg(IFormFile file)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!_allowedExtensions.Contains(fileExtension) || !_allowedContentTypes.Contains(file.ContentType))
+        {
+            return BadRequest("Invalid file type. Only image files are allowed.");
+        }
+
+        try {
+            ImageDimensions dimensions = new()
+            {
+                Width = 256,
+                Height = 256,
+                KeepAspectRatio = false
+            };
+
+            int id = await _imageService.StoreImageAsync(file.OpenReadStream(), dimensions);
+
+            /* Check if user already has image */
+            if (user.ImgId != null)
+            {
+                await _imageService.DeleteImageAsync(user.ImgId.Value);
+            }
+
+            user.ImgId = id;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(id);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e);
+        }
+    }
+
+    [HttpDelete("img")]
+    [Authorize]
+    public async Task<IActionResult> DeleteUserImg()
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        if (user.ImgId != null)
+        {
+            /* Deleting "cascades" foreign key in user to null automatically */
+            await _imageService.DeleteImageAsync(user.ImgId.Value);
+        }
+        return Ok();
     }
 }
