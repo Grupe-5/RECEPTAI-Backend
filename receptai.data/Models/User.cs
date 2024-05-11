@@ -21,5 +21,5 @@ public class User : IdentityUser<int>
     public virtual ICollection<Comment>? Comments { get; set; }
     public virtual ICollection<RecipeVote>? RecipeVotes { get; set; }
     public virtual ICollection<CommentVote>? CommentVotes { get; set; }
-    public virtual ICollection<Subfooddit>? Subfooddits { get; set; }
+    public virtual ICollection<Subfooddit> Subfooddits { get; set; } = new List<Subfooddit>();
 }

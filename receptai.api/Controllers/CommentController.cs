@@ -20,15 +20,27 @@ public class CommentController : ControllerBase
         _commentRepository = commentRepository;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll(
-        [FromQuery] QueryComment query)
+    [HttpGet("by-user/{userId}")]
+    public async Task<IActionResult> GetCommentsByUserId(int userId)
     {
-        var comments = await _commentRepository.GetAllAsync(query);
-        var commentDto = comments.Select(c => c.ToCommentDto());
-
-        return Ok(commentDto);
+        var comments = await _commentRepository.GetCommentsByUserId(userId);
+        if (comments == null || comments.Count == 0)
+        {
+            return NotFound("No comments found for the provided user ID.");
+        }
+        return Ok(comments);
     }
+
+    [HttpGet("by-recipe/{recipeId}")]
+    public async Task<IActionResult> GetCommentsByRecipeId(int recipeId)
+    {
+        var comments = await _commentRepository.GetCommentsByRecipeId(recipeId);
+        if (comments == null || comments.Count == 0)
+        {
+            return NotFound("No comments found for the provided recipe ID.");
+        }
+        return Ok(comments);
+    } 
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)

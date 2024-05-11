@@ -14,7 +14,6 @@ public class RecipePlatformDbContext(
     public DbSet<RecipeVote> RecipeVotes { get; set; }
     public DbSet<CommentVote> CommentVotes { get; set; }
     public DbSet<Image> Images { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

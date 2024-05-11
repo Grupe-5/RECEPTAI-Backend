@@ -39,23 +39,18 @@ public class CommentRepository : ICommentRepository
         return commentModel;
     }
 
-    public async Task<List<Comment>> GetAllAsync(QueryComment query)
+    public async Task<List<Comment>> GetCommentsByUserId(int userId)
     {
-        var comments = _context.Comments.AsQueryable();
+        return await _context.Comments
+            .Where(c => c.UserId == userId)
+            .ToListAsync();
+    }
 
-        // Filter by RecipeId if provided
-        if (query.RecipeId.HasValue)
-        {
-            comments = comments.Where(cr => cr.RecipeId == query.RecipeId.Value);
-        }
-
-        // Filter by UserId if provided
-        if (query.UserId.HasValue)
-        {
-            comments = comments.Where(cu => cu.UserId == query.UserId.Value);
-        }
-
-        return await comments.ToListAsync();
+    public async Task<List<Comment>> GetCommentsByRecipeId(int recipeId)
+    {
+        return await _context.Comments
+            .Where(c => c.RecipeId == recipeId)
+            .ToListAsync();
     }
 
     public async Task<Comment?> GetByIdAsync(int id)

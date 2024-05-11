@@ -4,6 +4,7 @@ using receptai.api.Dtos.Subfooddit;
 using receptai.api.Helpers;
 using receptai.api.Interfaces;
 using receptai.data;
+using System.Xml.Linq;
 
 namespace receptai.api.Repositories;
 
@@ -40,16 +41,9 @@ public class SubfoodditRepository : ISubfoodditRepository
         return subfoodditModel;
     }
 
-    //TODO Get all subfooddits, where user is in
-    public async Task<List<Subfooddit>> GetAllAsync(QuerySubfooddit query)
+    public async Task<List<Subfooddit>> GetAllAsync()
     {
         var subfooddits = _context.Subfooddits.AsQueryable();
-
-        // Filter by UserId if provided
-        if (query.UserId.HasValue)
-        {
-            //TODO subfooddits = subfooddits.Where(r => r.UserId == query.UserId.Value);
-        }
 
         return await subfooddits.ToListAsync();
     }
@@ -78,4 +72,58 @@ public class SubfoodditRepository : ISubfoodditRepository
 
         return existingSubfooddit;
     }
+
+    public async Task<bool> AddUserToSubfooddit(int subfoodditId, int userId)
+    {
+        var subfooddit = await _context.Subfooddits
+            .Include(s => s.Users)
+            .FirstOrDefaultAsync(s => s.SubfoodditId == subfoodditId);
+        var user = await _context.Users.FindAsync(userId);
+
+        if (subfooddit != null && user != null && !subfooddit.Users.Contains(user))
+        {
+            subfooddit.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<bool> RemoveUserFromSubfooddit(int subfoodditId, int userId)
+    {
+        var subfooddit = await _context.Subfooddits
+            .Include(s => s.Users)
+            .FirstOrDefaultAsync(s => s.SubfoodditId == subfoodditId);
+        var user = subfooddit?.Users?.FirstOrDefault(u => u.Id == userId);
+
+        if (subfooddit != null && user != null)
+        {
+            subfooddit.Users?.Remove(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        return false;
+    }
+    public async Task<List<Subfooddit>> GetSubfoodditsByUserId(int userId)
+    {
+        return await _context.Users
+            .Where(u => u.Id == userId)
+            .SelectMany(u => u.Subfooddits)
+            .ToListAsync();
+    }
+
+    public async Task<List<UserSummaryDto>> GetUsersBySubfoodditId(int subfoodditId)
+    {
+        return await _context.Subfooddits
+            .Where(s => s.SubfoodditId == subfoodditId)
+            .SelectMany(s => s.Users)
+            .Select(u => new UserSummaryDto
+            {
+                UserId = u.Id,
+                UserName = u.UserName,
+                ImageId = u.ImgId       
+            })
+            .ToListAsync();
+    }
+
 }

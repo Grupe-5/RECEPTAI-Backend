@@ -17,5 +17,5 @@ public class Subfooddit
     public DateTime CreationDate { get; set; } = DateTime.Now;
 
     public virtual ICollection<Recipe>? Recipes { get; set; }
-    public virtual ICollection<User>? Users { get; set; }
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

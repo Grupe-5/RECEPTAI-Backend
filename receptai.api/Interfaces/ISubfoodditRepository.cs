@@ -6,8 +6,7 @@ namespace receptai.api.Interfaces;
 
 public interface ISubfoodditRepository
 {
-    Task<List<Subfooddit>> GetAllAsync(
-        QuerySubfooddit query);
+    Task<List<Subfooddit>> GetAllAsync();
 
     Task<Subfooddit?> GetByIdAsync(int id);
 
@@ -17,4 +16,8 @@ public interface ISubfoodditRepository
         UpdateSubfoodditRequestDto subfoodditDto);
 
     Task<Subfooddit?> DeleteAsync(int id);
+    Task<bool> AddUserToSubfooddit(int subfoodditId, int userId);
+    Task<bool> RemoveUserFromSubfooddit(int subfoodditId, int userId);
+    Task<List<Subfooddit>> GetSubfoodditsByUserId(int userId);
+    Task<List<UserSummaryDto>> GetUsersBySubfoodditId(int subfoodditId);
 }
