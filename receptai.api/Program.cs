@@ -78,6 +78,7 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<ISubfoodditRepository, SubfoodditRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ISubfoodditRepository, SubfoodditRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();

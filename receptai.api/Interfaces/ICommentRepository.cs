@@ -6,8 +6,8 @@ namespace receptai.api.Interfaces;
 
 public interface ICommentRepository
 {
-    Task<List<Comment>> GetAllAsync(
-        QueryComment query);
+    Task<List<Comment>> GetCommentsByUserId(int userId);
+    Task<List<Comment>> GetCommentsByRecipeId(int recipeId);
 
     Task<Comment?> GetByIdAsync(int id);
 
