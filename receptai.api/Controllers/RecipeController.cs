@@ -1,8 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using receptai.api.Dtos.Recipe;
 using receptai.api.Extensions;
-using receptai.api.Helpers;
 using receptai.api.Interfaces;
 using receptai.api.Mappers;
 
@@ -47,16 +46,6 @@ public class RecipeController : ControllerBase
         return Ok(recipe.ToRecipeDto());
     }
 
-    [HttpGet("{id:int}/aggregated_votes")]
-    public async Task<IActionResult> GetAggregatedVotesById(
-        [FromRoute] int id)
-    {
-        var recipeVotes = await _recipeVoteRepository
-            .GetAggregatedRecipeVotesByRecipeId(id);
-
-        return Ok(recipeVotes);
-    }
-
     [HttpGet("by_user/{userId}")]
     public async Task<IActionResult> GetRecipesByUserId(int userId)
     {
@@ -73,7 +62,18 @@ public class RecipeController : ControllerBase
         return Ok(recipes);
     }
 
+    [HttpGet("aggregated_votes/{id:int}")]
+    public async Task<IActionResult> GetAggregatedVotesById(
+    [FromRoute] int id)
+    {
+        var recipeVotes = await _recipeVoteRepository
+            .GetAggregatedRecipeVotesByRecipeId(id);
+
+        return Ok(recipeVotes);
+    }
+
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Create(
         [FromBody] CreateRecipeRequestDto recipeDto)
     {
@@ -92,6 +92,7 @@ public class RecipeController : ControllerBase
             recipeModel.SubfoodditName = subfoodditName;
         }
 
+        recipeModel.UserId = User.GetId();
         recipeModel.UserName = User.GetUsername();
 
         await _recipeRepository.CreateAsync(recipeModel);

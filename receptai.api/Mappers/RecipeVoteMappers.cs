@@ -21,7 +21,6 @@ public static class RecipeVoteMappers
     {
         return new RecipeVote
         {
-            UserId = recipeVoteModel.UserId,
             RecipeId = recipeVoteModel.RecipeId,
             VoteType = recipeVoteModel.VoteType,
             VoteDate = recipeVoteModel.VoteDate

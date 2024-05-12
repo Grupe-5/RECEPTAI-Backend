@@ -1,5 +1,4 @@
 ﻿using receptai.data;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace receptai.api.Dtos.RecipeVote;
 

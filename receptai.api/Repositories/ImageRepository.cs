@@ -1,5 +1,4 @@
-﻿
-using receptai.data;
+﻿using receptai.data;
 
 namespace receptai.api;
 

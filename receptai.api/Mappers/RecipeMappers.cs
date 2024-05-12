@@ -31,7 +31,6 @@ public static class RecipeMappers
     {
         return new Recipe
         {
-            UserId = recipeModel.UserId,
             Title = recipeModel.Title,
             ImgId = recipeModel.ImgId,
             SubfoodditId = recipeModel.SubfoodditId,

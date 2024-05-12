@@ -5,9 +5,6 @@ namespace receptai.api.Dtos.Recipe;
 public class CreateRecipeRequestDto
 {
     [Required]
-    public int UserId { get; set; }
-
-    [Required]
     [MaxLength(255, ErrorMessage = "Title may not be longer than 255 characters!")]
     public string Title { get; set; } = null!;
 

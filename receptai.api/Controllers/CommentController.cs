@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using receptai.api.Dtos.Comment;
-using receptai.api.Helpers;
+using receptai.api.Extensions;
 using receptai.api.Interfaces;
 using receptai.api.Mappers;
-using receptai.api.Repositories;
-using receptai.data;
 
 namespace receptai.api.Controllers;
 
@@ -18,6 +16,19 @@ public class CommentController : ControllerBase
     public CommentController(ICommentRepository commentRepository)
     {
         _commentRepository = commentRepository;
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById([FromRoute] int id)
+    {
+        var comment = await _commentRepository.GetByIdAsync(id);
+
+        if (comment is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(comment.ToCommentDto());
     }
 
     [HttpGet("by_user/{userId}")]
@@ -42,20 +53,8 @@ public class CommentController : ControllerBase
         return Ok(comments);
     } 
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById([FromRoute] int id)
-    {
-        var comment = await _commentRepository.GetByIdAsync(id);
-
-        if (comment is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(comment.ToCommentDto());
-    }
-
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Create(
         [FromBody] CreateCommentRequestDto commentDto)
     {
@@ -65,6 +64,7 @@ public class CommentController : ControllerBase
         }
 
         var commentModel = commentDto.ToCommentFromCreateDto();
+        commentModel.UserId = User.GetId();
         await _commentRepository.CreateAsync(commentModel);
 
         return CreatedAtAction(nameof(GetById),
