@@ -1,6 +1,4 @@
-
 using System.Security.Claims;
-using receptai.data;
 
 namespace receptai.api.Extensions
 {

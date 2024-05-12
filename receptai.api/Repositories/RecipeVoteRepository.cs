@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using receptai.api.Dtos.RecipeVote;
 using receptai.api.Interfaces;
-using receptai.api.Mappers;
 using receptai.data;
 
 namespace receptai.api.Repositories;

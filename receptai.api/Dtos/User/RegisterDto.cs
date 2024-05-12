@@ -1,7 +1,4 @@
-
-
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Identity.Client;
 
 namespace api.Dtos.User
 {

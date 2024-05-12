@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace receptai.api;
+﻿namespace receptai.api;
 
 public class NewUserDto
 {

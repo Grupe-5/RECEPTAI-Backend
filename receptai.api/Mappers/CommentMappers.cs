@@ -23,7 +23,6 @@ public static class CommentMappers
         return new Comment
         {
             RecipeId = commentModel.RecipeId,
-            UserId = commentModel.UserId,
             CommentText = commentModel.CommentText,
             CommentDate = commentModel.CommentDate
         };

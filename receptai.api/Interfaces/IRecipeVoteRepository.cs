@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using receptai.api.Dtos.RecipeVote;
+﻿using receptai.api.Dtos.RecipeVote;
 using receptai.data;
 
 namespace receptai.api.Interfaces;

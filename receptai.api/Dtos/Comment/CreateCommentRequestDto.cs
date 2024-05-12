@@ -8,9 +8,6 @@ public class CreateCommentRequestDto
     public int RecipeId { get; set; }
 
     [Required]
-    public int UserId { get; set; }
-
-    [Required]
     [MaxLength(1000, ErrorMessage = "Comment may not be longer than 1000 characters!")]
     public string CommentText { get; set; } = null!;
 

@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using receptai.api.Dtos.RecipeVote;
+using receptai.api.Extensions;
 using receptai.api.Interfaces;
 using receptai.api.Mappers;
-using receptai.api.Repositories;
-using receptai.data;
 
 namespace receptai.api.Controllers;
 
@@ -23,12 +22,12 @@ public class RecipeVoteController : ControllerBase
         _recipeRepository = recipeRepository;
     }
 
-    [HttpGet("{userId}/{recipeId}")]
-    public async Task<IActionResult> GetByUserAndRecipeId(
-        [FromRoute] int userId, [FromRoute] int recipeId)
+    [HttpGet("me/{recipeId}")]
+    [Authorize]
+    public async Task<IActionResult> GetByUserAndRecipeId([FromRoute] int recipeId)
     {
         var recipeVote = await _recipeVoteRepository.GetByUserAndRecipeId(
-            userId, recipeId);
+            User.GetId(), recipeId);
 
         if (recipeVote is null)
         {
@@ -54,6 +53,7 @@ public class RecipeVoteController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Create(
         [FromBody] CreateRecipeVoteRequestDto recipeVoteDto)
     {
@@ -63,6 +63,7 @@ public class RecipeVoteController : ControllerBase
         }
 
         var recipeVoteModel = recipeVoteDto.ToRecipeVoteFromCreateDto();
+        recipeVoteModel.UserId = User.GetId();
         await _recipeVoteRepository.CreateAsync(recipeVoteModel);
 
         return CreatedAtAction(
@@ -76,9 +77,10 @@ public class RecipeVoteController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{userId}/{recipeId}")]
-    public async Task<IActionResult> Update([FromRoute] int userId,
-        [FromRoute] int recipeId, [FromBody] UpdateRecipeVoteRequestDto recipeVoteDto)
+    [Route("{recipeId}")]
+    [Authorize]
+    public async Task<IActionResult> Update([FromRoute] int recipeId,
+        [FromBody] UpdateRecipeVoteRequestDto recipeVoteDto)
     {
         if (!ModelState.IsValid) 
         {
@@ -86,7 +88,7 @@ public class RecipeVoteController : ControllerBase
         }
 
         var recipeVoteModel = await _recipeVoteRepository
-            .UpdateAsync(userId, recipeId, recipeVoteDto);
+            .UpdateAsync(User.GetId(), recipeId, recipeVoteDto);
 
         if (recipeVoteModel is null)
         {
@@ -97,12 +99,12 @@ public class RecipeVoteController : ControllerBase
     }
 
     [HttpDelete]
-    [Route("{userId}/{recipeId}")]
-    public async Task<IActionResult> Delete([FromRoute] int userId,
-        [FromRoute] int recipeId)
+    [Route("{recipeId}")]
+    [Authorize]
+    public async Task<IActionResult> Delete([FromRoute] int recipeId)
     {
         var recipeVoteModel = await _recipeVoteRepository
-            .DeleteAsync(userId, recipeId);
+            .DeleteAsync(User.GetId(), recipeId);
 
         if (recipeVoteModel is null)
         {
