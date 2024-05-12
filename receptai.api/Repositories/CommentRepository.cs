@@ -39,6 +39,11 @@ public class CommentRepository : ICommentRepository
         return commentModel;
     }
 
+    public async Task<Comment?> GetByIdAsync(int id)
+    {
+        return await _context.Comments.FindAsync(id);
+    }
+
     public async Task<List<Comment>> GetCommentsByUserId(int userId)
     {
         return await _context.Comments
@@ -53,16 +58,11 @@ public class CommentRepository : ICommentRepository
             .ToListAsync();
     }
 
-    public async Task<Comment?> GetByIdAsync(int id)
-    {
-        return await _context.Comments.FindAsync(id);
-    }
-
     public async Task<Comment?> UpdateAsync(int id,
         UpdateCommentRequestDto commentDto)
     {
         var existingComment = await _context.Comments
-            .FirstOrDefaultAsync(xc => xc.CommentId == id);
+            .FirstOrDefaultAsync(c => c.CommentId == id);
 
         if (existingComment is null)
         {
@@ -75,5 +75,26 @@ public class CommentRepository : ICommentRepository
         await _context.SaveChangesAsync();
 
         return existingComment;
+    }
+
+    public async Task<int> RecalculateVotesAsync(int commentId)
+    {
+        var votes = await _context.CommentVotes
+            .Where(cv => cv.CommentId == commentId)
+            .ToListAsync();
+
+        var aggregatedVotes = votes.Sum(v => v.VoteType == VoteType.Upvote ? 1 : -1);
+
+        var comment = await _context.Comments.FindAsync(commentId);
+
+        if (comment is not null)
+        {
+            comment.AggregatedVotes = aggregatedVotes;
+            await _context.SaveChangesAsync();
+        }
+
+        var test = _context.Comments.Find(commentId).AggregatedVotes;
+
+        return aggregatedVotes;
     }
 }

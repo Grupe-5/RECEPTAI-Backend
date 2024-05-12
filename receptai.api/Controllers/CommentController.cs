@@ -5,7 +5,6 @@ using receptai.api.Helpers;
 using receptai.api.Interfaces;
 using receptai.api.Mappers;
 using receptai.api.Repositories;
-using receptai.data;
 
 namespace receptai.api.Controllers;
 
@@ -14,20 +13,20 @@ namespace receptai.api.Controllers;
 public class CommentController : ControllerBase
 {
     private readonly ICommentRepository _commentRepository;
+    private readonly ICommentVoteRepository _commentVoteRepository;
 
-    public CommentController(ICommentRepository commentRepository)
+    public CommentController(ICommentRepository commentRepository,
+        ICommentVoteRepository commentVoteRepository)
     {
         _commentRepository = commentRepository;
+        _commentVoteRepository = commentVoteRepository;
     }
 
     [HttpGet("by-user/{userId}")]
     public async Task<IActionResult> GetCommentsByUserId(int userId)
     {
         var comments = await _commentRepository.GetCommentsByUserId(userId);
-        if (comments == null || comments.Count == 0)
-        {
-            return NotFound("No comments found for the provided user ID.");
-        }
+
         return Ok(comments);
     }
 
@@ -35,12 +34,19 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetCommentsByRecipeId(int recipeId)
     {
         var comments = await _commentRepository.GetCommentsByRecipeId(recipeId);
-        if (comments == null || comments.Count == 0)
-        {
-            return NotFound("No comments found for the provided recipe ID.");
-        }
+
         return Ok(comments);
-    } 
+    }
+
+    [HttpGet("aggregated_votes/{id:int}")]
+    public async Task<IActionResult> GetAggregatedVotesById(
+    [FromRoute] int id)
+    {
+        var commentVotes = await _commentVoteRepository
+            .GetAggregatedCommentVotesByCommentId(id);
+
+        return Ok(commentVotes);
+    }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
@@ -65,6 +71,8 @@ public class CommentController : ControllerBase
         }
 
         var commentModel = commentDto.ToCommentFromCreateDto();
+
+        commentModel.UserId = User.GetId();
         await _commentRepository.CreateAsync(commentModel);
 
         return CreatedAtAction(nameof(GetById),

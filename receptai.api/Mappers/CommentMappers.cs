@@ -12,6 +12,7 @@ public static class CommentMappers
             CommentId = commentModel.CommentId,
             RecipeId = commentModel.RecipeId,
             UserId = commentModel.UserId,
+            AggregatedVotes = commentModel.AggregatedVotes,
             CommentText = commentModel.CommentText,
             CommentDate = commentModel.CommentDate
         };

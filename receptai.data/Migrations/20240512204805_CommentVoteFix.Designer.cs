@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using receptai.data;
 
@@ -10,9 +11,11 @@ using receptai.data;
 namespace receptai.data.Migrations
 {
     [DbContext(typeof(RecipePlatformDbContext))]
-    partial class RecipePlatformDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240512204805_CommentVoteFix")]
+    partial class CommentVoteFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
@@ -248,6 +251,9 @@ namespace receptai.data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("AggregatedVotes")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("CookingDifficulty")
                         .HasColumnType("INTEGER");
 
@@ -255,10 +261,6 @@ namespace receptai.data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DatePosted")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(5000)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("ImgId")
@@ -278,6 +280,10 @@ namespace receptai.data.Migrations
                     b.Property<int>("SubfoodditId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("SubfoodditName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -285,6 +291,10 @@ namespace receptai.data.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("RecipeId");
 
