@@ -7,7 +7,7 @@ using receptai.api.Mappers;
 
 namespace receptai.api.Controllers;
 
-[Route("api/vote")]
+[Route("api/recipe_vote")]
 [ApiController]
 public class RecipeVoteController : ControllerBase
 {

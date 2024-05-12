@@ -16,6 +16,8 @@ public class Comment
     [ForeignKey("User")]
     public int UserId { get; set; }
 
+    public int AggregatedVotes { get; set; }
+
     [Required]
     [StringLength(1000)]
     public string CommentText { get; set; } = null!;
