@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using receptai.api.Dtos.Recipe;
 using receptai.api.Helpers;
 using receptai.api.Interfaces;
@@ -39,28 +40,28 @@ public class RecipeRepository : IRecipeRepository
         return recipeModel;
     }
 
-    public async Task<List<Recipe>> GetAllAsync(QueryRecipe query)
+    public async Task<List<Recipe>> GetAllAsync()
     {
-        var recipes = _context.Recipes.AsQueryable();
-
-        // Filter by UserId if provided
-        if (query.UserId.HasValue)
-        {
-            recipes = recipes.Where(r => r.UserId == query.UserId.Value);
-        }
-
-        // Filter by SubfoodditId if provided
-        if (query.SubfoodditId.HasValue)
-        {
-            recipes = recipes.Where(r => r.SubfoodditId == query.SubfoodditId.Value);
-        }
-
-        return await recipes.ToListAsync();
+        return await _context.Recipes.ToListAsync();
     }
 
     public async Task<Recipe?> GetByIdAsync(int id)
     {
         return await _context.Recipes.FindAsync(id);
+    }
+
+    public async Task<List<Recipe>> GetRecipesByUserId(int userId)
+    {
+        return await _context.Recipes
+            .Where(r => r.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId)
+    {
+        return await _context.Recipes
+            .Where(r => r.SubfoodditId == subfoodditId)
+            .ToListAsync();
     }
 
     public async Task<Recipe?> UpdateAsync(int id,
@@ -77,7 +78,6 @@ public class RecipeRepository : IRecipeRepository
         existingRecipe.Title = recipeDto.Title;
         existingRecipe.ImgId = recipeDto.ImgId;
         existingRecipe.Ingredients = recipeDto.Ingredients;
-        existingRecipe.Description = recipeDto.Description;
         existingRecipe.CookingTime = recipeDto.CookingTime;
         existingRecipe.Servings = recipeDto.Servings;
         existingRecipe.DatePosted = recipeDto.DatePosted;
@@ -87,5 +87,24 @@ public class RecipeRepository : IRecipeRepository
         await _context.SaveChangesAsync();
 
         return existingRecipe;
+    }
+
+    public async Task<int> RecalculateVotesAsync(int recipeId)
+    {
+        var votes = await _context.RecipeVotes
+            .Where(rv => rv.RecipeId == recipeId)
+            .ToListAsync();
+
+        var aggregatedVotes = votes.Sum(v => v.VoteType == VoteType.Upvote ? 1 : -1);
+
+        var recipe = await _context.Recipes.FindAsync(recipeId);
+
+        if (recipe is not null)
+        {
+            recipe.AggregatedVotes = aggregatedVotes;
+            await _context.SaveChangesAsync();
+        }
+
+        return aggregatedVotes;
     }
 }

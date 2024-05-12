@@ -1,4 +1,5 @@
-﻿using receptai.api.Dtos.Recipe;
+﻿using Microsoft.EntityFrameworkCore;
+using receptai.api.Dtos.Recipe;
 using receptai.api.Helpers;
 using receptai.data;
 
@@ -6,8 +7,7 @@ namespace receptai.api.Interfaces;
 
 public interface IRecipeRepository
 {
-    Task<List<Recipe>> GetAllAsync(
-        QueryRecipe query);
+    Task<List<Recipe>> GetAllAsync();
 
     Task<Recipe?> GetByIdAsync(int id);
 
@@ -18,4 +18,9 @@ public interface IRecipeRepository
     
     Task<Recipe?> DeleteAsync(int id);
 
+    Task<int> RecalculateVotesAsync(int recipeId);
+
+    Task<List<Recipe>> GetRecipesByUserId(int userId);
+
+    Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId);
 }

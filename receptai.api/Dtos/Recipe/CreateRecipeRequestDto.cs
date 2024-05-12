@@ -19,9 +19,6 @@ public class CreateRecipeRequestDto
     [Required]
     public string Ingredients { get; set; } = null!;
 
-    [MaxLength(5000, ErrorMessage = "Description may not be longer than 5000 characters!")]
-    public string? Description { get; set; } = null!;
-
     public string? CookingTime { get; set; } = null!;
 
     [Range(1, int.MaxValue, ErrorMessage = "Servings must be a positive number!")]

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using receptai.api.Dtos.Recipe;
+using receptai.api.Extensions;
 using receptai.api.Helpers;
 using receptai.api.Interfaces;
 using receptai.api.Mappers;
-using receptai.data;
 
 namespace receptai.api.Controllers;
 
@@ -13,17 +13,22 @@ namespace receptai.api.Controllers;
 public class RecipeController : ControllerBase
 {
     private readonly IRecipeRepository _recipeRepository;
+    private readonly IRecipeVoteRepository _recipeVoteRepository;
+    private readonly ISubfoodditRepository _subfoodditRepository;
 
-    public RecipeController(IRecipeRepository recipeRepository)
+    public RecipeController(IRecipeRepository recipeRepository,
+        IRecipeVoteRepository recipeVoteRepository,
+        ISubfoodditRepository subfoodditRepository)
     {
         _recipeRepository = recipeRepository;
+        _recipeVoteRepository = recipeVoteRepository;
+        _subfoodditRepository = subfoodditRepository;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(
-        [FromQuery] QueryRecipe query)
+    public async Task<IActionResult> GetAll()
     {
-        var recipes = await _recipeRepository.GetAllAsync(query);
+        var recipes = await _recipeRepository.GetAllAsync();
         var recipeDto = recipes.Select(r => r.ToRecipeDto());
 
         return Ok(recipeDto);
@@ -42,6 +47,32 @@ public class RecipeController : ControllerBase
         return Ok(recipe.ToRecipeDto());
     }
 
+    [HttpGet("{id:int}/aggregated_votes")]
+    public async Task<IActionResult> GetAggregatedVotesById(
+        [FromRoute] int id)
+    {
+        var recipeVotes = await _recipeVoteRepository
+            .GetAggregatedRecipeVotesByRecipeId(id);
+
+        return Ok(recipeVotes);
+    }
+
+    [HttpGet("by_user/{userId}")]
+    public async Task<IActionResult> GetRecipesByUserId(int userId)
+    {
+        var recipes = await _recipeRepository.GetRecipesByUserId(userId);
+
+        return Ok(recipes);
+    }
+
+    [HttpGet("by_subfooddit/{subfoodditId}")]
+    public async Task<IActionResult> GetRecipesBySubfoodditId(int subfoodditId)
+    {
+        var recipes = await _recipeRepository.GetRecipesBySubfoodditId(subfoodditId);
+
+        return Ok(recipes);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] CreateRecipeRequestDto recipeDto)
@@ -52,6 +83,17 @@ public class RecipeController : ControllerBase
         }
 
         var recipeModel = recipeDto.ToRecipeFromCreateDto();
+
+        var subfoodditName = _subfoodditRepository
+            .GetByIdAsync(recipeModel.SubfoodditId).Result?.Title;
+
+        if (subfoodditName is not null)
+        {
+            recipeModel.SubfoodditName = subfoodditName;
+        }
+
+        recipeModel.UserName = User.GetUsername();
+
         await _recipeRepository.CreateAsync(recipeModel);
 
         return CreatedAtAction(nameof(GetById),
