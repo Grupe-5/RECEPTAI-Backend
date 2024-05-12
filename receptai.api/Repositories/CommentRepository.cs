@@ -92,8 +92,6 @@ public class CommentRepository : ICommentRepository
             await _context.SaveChangesAsync();
         }
 
-        var test = _context.Comments.Find(commentId).AggregatedVotes;
-
         return aggregatedVotes;
     }
 }
