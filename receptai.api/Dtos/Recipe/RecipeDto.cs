@@ -6,15 +6,19 @@ public class RecipeDto
 
     public int UserId { get; set; }
 
+    public string UserName { get; set; } = null!;
+
     public string Title { get; set; } = null!;
+
+    public int AggregatedVotes { get; set; }
 
     public int? ImgId { get; set; }
 
     public int SubfoodditId { get; set; }
 
-    public string Ingredients { get; set; } = null!;
+    public string SubfoodditName { get; set; } = null!;
 
-    public string? Description { get; set; } = null!;
+    public string Ingredients { get; set; } = null!;
 
     public string? CookingTime { get; set; } = null!;
 

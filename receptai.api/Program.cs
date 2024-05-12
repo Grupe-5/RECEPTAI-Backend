@@ -82,6 +82,7 @@ builder.Services.AddScoped<ISubfoodditRepository, SubfoodditRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IRecipeVoteRepository, RecipeVoteRepository>();
 
 var app = builder.Build();
 

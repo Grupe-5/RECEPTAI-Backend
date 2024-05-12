@@ -20,7 +20,7 @@ public class CommentController : ControllerBase
         _commentRepository = commentRepository;
     }
 
-    [HttpGet("by-user/{userId}")]
+    [HttpGet("by_user/{userId}")]
     public async Task<IActionResult> GetCommentsByUserId(int userId)
     {
         var comments = await _commentRepository.GetCommentsByUserId(userId);
@@ -31,7 +31,7 @@ public class CommentController : ControllerBase
         return Ok(comments);
     }
 
-    [HttpGet("by-recipe/{recipeId}")]
+    [HttpGet("by_recipe/{recipeId}")]
     public async Task<IActionResult> GetCommentsByRecipeId(int recipeId)
     {
         var comments = await _commentRepository.GetCommentsByRecipeId(recipeId);

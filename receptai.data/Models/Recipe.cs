@@ -12,6 +12,10 @@ public class Recipe
     [ForeignKey("User")]
     public int UserId { get; set; }
 
+    public string UserName { get; set; } = null!;
+
+    public int AggregatedVotes { get; set; }
+
     [Required]
     [StringLength(255)]
     public string Title { get; set; } = null!;
@@ -23,11 +27,10 @@ public class Recipe
     [ForeignKey("Subfooddit")]
     public int SubfoodditId { get; set; }
 
+    public string SubfoodditName { get; set; } = null!;
+
     [Required]
     public string Ingredients { get; set; } = null!;
-
-    [StringLength(5000)]
-    public string? Description { get; set; }
 
     public string? CookingTime { get; set; }
 
@@ -46,6 +49,6 @@ public class Recipe
     public virtual User User { get; set; } = null!;
     public virtual Image? Image { get; set; }
     public virtual Subfooddit Subfooddit { get; set; } = null!;
-    public virtual ICollection<Comment>? Comments { get; set; }
-    public virtual ICollection<RecipeVote>? Votes { get; set; }
+    public virtual ICollection<Comment>? Comments { get; set; } = new List<Comment>();
+    public virtual ICollection<RecipeVote>? Votes { get; set; } = new List<RecipeVote>();
 }

@@ -117,7 +117,7 @@ public class SubfoodditController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("by-user/{userId}")]
+    [HttpGet("by_user/{userId}")]
     public async Task<IActionResult> GetSubfoodditsByUserId(int userId)
     {
         var subfooddits = await _subfoodditRepository.GetSubfoodditsByUserId(userId);
@@ -128,7 +128,7 @@ public class SubfoodditController : ControllerBase
         return Ok(subfooddits);
     }
 
-    [HttpGet("by-subfooddit/{subfoodditId}")]
+    [HttpGet("by_subfooddit/{subfoodditId}")]
     public async Task<IActionResult> GetUsersBySubfoodditId(int subfoodditId)
     {
         var userSummaries = await _subfoodditRepository.GetUsersBySubfoodditId(subfoodditId);
