@@ -6,12 +6,10 @@ namespace receptai.data;
 public class CommentVote
 {
     [Required]
-    [Column(Order = 0)]
     [ForeignKey("User")]
     public int UserId { get; set; }
 
     [Required]
-    [Column(Order = 1)]
     [ForeignKey("Comment")]
     public int CommentId { get; set; }
 

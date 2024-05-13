@@ -7,7 +7,6 @@ namespace receptai.api.Dtos.RecipeVote;
 public class CreateRecipeVoteRequestDto
 {
     [Required]
-    [Column(Order = 1)]
     [ForeignKey("Recipe")]
     public int RecipeId { get; set; }
 

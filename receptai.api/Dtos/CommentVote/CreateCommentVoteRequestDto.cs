@@ -7,7 +7,6 @@ namespace receptai.api.Dtos.CommentVote;
 public class CreateCommentVoteRequestDto
 {
     [Required]
-    [Column(Order = 1)]
     [ForeignKey("Comment")]
     public int CommentId { get; set; }
 
