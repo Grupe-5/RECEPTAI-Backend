@@ -32,12 +32,11 @@ public static class RecipeMappers
         return new Recipe
         {
             Title = recipeModel.Title,
-            ImgId = recipeModel.ImgId,
             SubfoodditId = recipeModel.SubfoodditId,
             Ingredients = recipeModel.Ingredients,
             CookingTime = recipeModel.CookingTime,
             Servings = recipeModel.Servings,
-            DatePosted = recipeModel.DatePosted,
+            DatePosted = DateTime.UtcNow,
             CookingDifficulty = recipeModel.CookingDifficulty,
             Instructions = recipeModel.Instructions
         };

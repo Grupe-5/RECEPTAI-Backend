@@ -14,14 +14,17 @@ public class RecipeController : ControllerBase
     private readonly IRecipeRepository _recipeRepository;
     private readonly IRecipeVoteRepository _recipeVoteRepository;
     private readonly ISubfoodditRepository _subfoodditRepository;
+    private readonly IImageService _imageService;
 
     public RecipeController(IRecipeRepository recipeRepository,
         IRecipeVoteRepository recipeVoteRepository,
-        ISubfoodditRepository subfoodditRepository)
+        ISubfoodditRepository subfoodditRepository,
+        IImageService imageService)
     {
         _recipeRepository = recipeRepository;
         _recipeVoteRepository = recipeVoteRepository;
         _subfoodditRepository = subfoodditRepository;
+        _imageService = imageService;
     }
 
     [HttpGet]
@@ -75,7 +78,7 @@ public class RecipeController : ControllerBase
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create(
-        [FromBody] CreateRecipeRequestDto recipeDto)
+        [FromForm] CreateRecipeRequestDto recipeDto)
     {
         if (!ModelState.IsValid)
         {
@@ -92,28 +95,74 @@ public class RecipeController : ControllerBase
             recipeModel.SubfoodditName = subfoodditName;
         }
 
+        if (recipeDto.Photo != null && recipeDto.Photo.Length != 0)
+        {
+            try {
+                ImageDimensions dimensions = new()
+                {
+                    Width = 1024,
+                    KeepAspectRatio = true
+                };
+
+                recipeModel.ImgId = await _imageService.StoreImageAsync(recipeDto.Photo.OpenReadStream(), dimensions);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+
         recipeModel.UserId = User.GetId();
         recipeModel.UserName = User.GetUsername();
 
-        await _recipeRepository.CreateAsync(recipeModel);
+        try {
+            await _recipeRepository.CreateAsync(recipeModel);
 
-        return CreatedAtAction(nameof(GetById),
-            new { id = recipeModel.RecipeId },
-            recipeModel.ToRecipeDto());
+            return CreatedAtAction(nameof(GetById),
+                new { id = recipeModel.RecipeId },
+                recipeModel.ToRecipeDto());
+        }
+        catch (Exception e)
+        {
+            if (recipeModel.ImgId != null)
+            {
+                await _imageService.DeleteImageAsync(recipeModel.ImgId.Value);
+            }
+            return StatusCode(500, e);
+        }
     }
 
     [HttpPut]
     [Route("{id:int}")]
+    [Authorize]
     public async Task<IActionResult> Update([FromRoute] int id,
-        [FromBody] UpdateRecipeRequestDto recipeDto)
+        [FromForm] UpdateRecipeRequestDto recipeDto, [FromQuery] bool remove_photo)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
+        int? imageId = null;
+        if (recipeDto.Photo != null && recipeDto.Photo.Length != 0 && remove_photo == false)
+        {
+            try {
+                ImageDimensions dimensions = new()
+                {
+                    Width = 1024,
+                    KeepAspectRatio = true
+                };
+
+                imageId = await _imageService.StoreImageAsync(recipeDto.Photo.OpenReadStream(), dimensions);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+
         var recipeModel = await _recipeRepository
-            .UpdateAsync(id, recipeDto);
+            .UpdateAsync(id, recipeDto, imageId, remove_photo);
 
         if (recipeModel is null)
         {
