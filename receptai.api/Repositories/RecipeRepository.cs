@@ -62,23 +62,33 @@ public class RecipeRepository : IRecipeRepository
             .ToListAsync();
     }
 
-    public async Task<Recipe?> UpdateAsync(int id,
-        UpdateRecipeRequestDto recipeDto)
+    public async Task<Recipe?> UpdateAsync(int id, UpdateRecipeRequestDto recipeDto, int? imageId, bool remove_image)
     {
         var existingRecipe = await _context.Recipes
             .FirstOrDefaultAsync(x => x.RecipeId == id);
-
         if (existingRecipe is null)
         {
             return null;
         }
 
+        if (imageId != null || remove_image) {
+            if (existingRecipe.ImgId != null) {
+                var existing_img = await _context.Images.FindAsync(existingRecipe.ImgId.Value);
+                existingRecipe.ImgId = imageId;
+                if (existing_img != null) {
+                    _context.Images.Remove(existing_img);
+                }
+            }
+            else
+            {
+                existingRecipe.ImgId = imageId;
+            }
+        }
+        
         existingRecipe.Title = recipeDto.Title;
-        existingRecipe.ImgId = recipeDto.ImgId;
         existingRecipe.Ingredients = recipeDto.Ingredients;
         existingRecipe.CookingTime = recipeDto.CookingTime;
         existingRecipe.Servings = recipeDto.Servings;
-        existingRecipe.DatePosted = recipeDto.DatePosted;
         existingRecipe.CookingDifficulty = recipeDto.CookingDifficulty;
         existingRecipe.Instructions = recipeDto.Instructions;
 

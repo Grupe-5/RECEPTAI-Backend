@@ -193,10 +193,15 @@ public class UserController(UserManager<User> userManager, ITokenService tokenSe
             /* Check if user already has image */
             if (user.ImgId != null)
             {
-                await _imageService.DeleteImageAsync(user.ImgId.Value);
+                int oldId = user.ImgId.Value;
+                user.ImgId = id;
+                await _imageService.DeleteImageAsync(oldId);
+            }
+            else
+            {
+                user.ImgId = id;
             }
 
-            user.ImgId = id;
             await _userManager.UpdateAsync(user);
 
             return Ok(id);

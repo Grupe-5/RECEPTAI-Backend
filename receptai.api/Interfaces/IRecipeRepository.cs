@@ -12,7 +12,7 @@ public interface IRecipeRepository
     Task<Recipe> CreateAsync(Recipe recipeModel);
 
     Task<Recipe?> UpdateAsync(int id,
-        UpdateRecipeRequestDto recipeDto);
+        UpdateRecipeRequestDto recipeDto, int? imageId, bool remove_photo);
     
     Task<Recipe?> DeleteAsync(int id);
 
