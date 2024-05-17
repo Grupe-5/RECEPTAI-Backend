@@ -5,7 +5,7 @@ namespace receptai.api.Interfaces;
 
 public interface IRecipeRepository
 {
-    Task<List<Recipe>> GetAllAsync();
+    Task<List<Recipe>> GetAllAsync(int offset = 0, int limit = 50);
 
     Task<Recipe?> GetByIdAsync(int id);
 
@@ -18,7 +18,7 @@ public interface IRecipeRepository
 
     Task<int> RecalculateVotesAsync(int recipeId);
 
-    Task<List<Recipe>> GetRecipesByUserId(int userId);
+    Task<List<Recipe>> GetRecipesByUserId(int userId, int offset = 0, int limit = 50);
 
-    Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId);
+    Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId, int offset = 0, int limit = 50);
 }

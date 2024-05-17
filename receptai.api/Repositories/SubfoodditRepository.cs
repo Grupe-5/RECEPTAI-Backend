@@ -63,7 +63,6 @@ public class SubfoodditRepository : ISubfoodditRepository
 
         existingSubfooddit.Title = subfoodditDto.Title;
         existingSubfooddit.Description = subfoodditDto.Description;
-        existingSubfooddit.CreationDate = subfoodditDto.CreationDate;
 
         await _context.SaveChangesAsync();
 
