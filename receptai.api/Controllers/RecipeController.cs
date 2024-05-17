@@ -28,9 +28,9 @@ public class RecipeController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
-        var recipes = await _recipeRepository.GetAllAsync();
+        var recipes = await _recipeRepository.GetAllAsync(offset, limit);
         var recipeDto = recipes.Select(r => r.ToRecipeDto());
 
         return Ok(recipeDto);
@@ -50,19 +50,21 @@ public class RecipeController : ControllerBase
     }
 
     [HttpGet("by_user/{userId}")]
-    public async Task<IActionResult> GetRecipesByUserId(int userId)
+    public async Task<IActionResult> GetRecipesByUserId(int userId, [FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
-        var recipes = await _recipeRepository.GetRecipesByUserId(userId);
+        var recipes = await _recipeRepository.GetRecipesByUserId(userId, offset, limit);
+        var recipeDto = recipes.Select(r => r.ToRecipeDto());
 
-        return Ok(recipes);
+        return Ok(recipeDto);
     }
 
     [HttpGet("by_subfooddit/{subfoodditId}")]
-    public async Task<IActionResult> GetRecipesBySubfoodditId(int subfoodditId)
+    public async Task<IActionResult> GetRecipesBySubfoodditId(int subfoodditId, [FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
-        var recipes = await _recipeRepository.GetRecipesBySubfoodditId(subfoodditId);
+        var recipes = await _recipeRepository.GetRecipesBySubfoodditId(subfoodditId, offset, limit);
+        var recipeDto = recipes.Select(r => r.ToRecipeDto());
 
-        return Ok(recipes);
+        return Ok(recipeDto);
     }
 
     [HttpGet("aggregated_votes/{id:int}")]

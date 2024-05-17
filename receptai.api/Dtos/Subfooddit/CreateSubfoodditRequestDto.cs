@@ -10,8 +10,4 @@ public class CreateSubfoodditRequestDto
 
     [MaxLength(5000, ErrorMessage = "Description may not be longer than 5000 characters!")]
     public string? Description { get; set; }
-
-    [Required]
-    public DateTime CreationDate { get; set; }
-
 }

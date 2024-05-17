@@ -38,9 +38,15 @@ public class RecipeRepository : IRecipeRepository
         return recipeModel;
     }
 
-    public async Task<List<Recipe>> GetAllAsync()
+    public async Task<List<Recipe>> GetAllAsync(int offset = 0, int limit = 10)
     {
-        return await _context.Recipes.ToListAsync();
+        if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset should be greater than or equal to 0.");
+        if (limit < 1) throw new ArgumentOutOfRangeException(nameof(limit), "Limit should be greater than or equal to 1.");
+
+        return await _context.Recipes
+            .Skip(offset)
+            .Take(limit)
+            .ToListAsync();
     }
 
     public async Task<Recipe?> GetByIdAsync(int id)
@@ -48,17 +54,27 @@ public class RecipeRepository : IRecipeRepository
         return await _context.Recipes.FindAsync(id);
     }
 
-    public async Task<List<Recipe>> GetRecipesByUserId(int userId)
+    public async Task<List<Recipe>> GetRecipesByUserId(int userId, int offset = 0, int limit = 10)
     {
+        if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset should be greater than or equal to 0.");
+        if (limit < 1) throw new ArgumentOutOfRangeException(nameof(limit), "Limit should be greater than or equal to 1.");
+
         return await _context.Recipes
             .Where(r => r.UserId == userId)
+            .Skip(offset)
+            .Take(limit)
             .ToListAsync();
     }
 
-    public async Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId)
+    public async Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId, int offset = 0, int limit = 10)
     {
+        if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset should be greater than or equal to 0.");
+        if (limit < 1) throw new ArgumentOutOfRangeException(nameof(limit), "Limit should be greater than or equal to 1.");
+
         return await _context.Recipes
             .Where(r => r.SubfoodditId == subfoodditId)
+            .Skip(offset)
+            .Take(limit)
             .ToListAsync();
     }
 
