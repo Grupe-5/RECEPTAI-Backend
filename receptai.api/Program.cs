@@ -86,6 +86,10 @@ builder.Services.AddScoped<ICommentVoteRepository, CommentVoteRepository>();
 
 builder.Services.AddSingleton<ITokenService, TokenService>();
 
+// Decorate image repo with in-memory cached variant
+builder.Services.AddMemoryCache();
+builder.Services.Decorate<IImageRepository, CachedImageRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
