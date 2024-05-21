@@ -80,10 +80,11 @@ builder.Services.AddScoped<ISubfoodditRepository, SubfoodditRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ISubfoodditRepository, SubfoodditRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
-builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IRecipeVoteRepository, RecipeVoteRepository>();
 builder.Services.AddScoped<ICommentVoteRepository, CommentVoteRepository>();
+
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 var app = builder.Build();
 
