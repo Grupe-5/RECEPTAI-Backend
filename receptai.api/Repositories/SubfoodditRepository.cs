@@ -71,34 +71,43 @@ public class SubfoodditRepository : ISubfoodditRepository
 
     public async Task<bool> AddUserToSubfooddit(int subfoodditId, int userId)
     {
-        var subfooddit = await _context.Subfooddits
-            .Include(s => s.Users)
-            .FirstOrDefaultAsync(s => s.SubfoodditId == subfoodditId);
-        var user = await _context.Users.FindAsync(userId);
-
-        if (subfooddit != null && user != null && !subfooddit.Users.Contains(user))
-        {
-            subfooddit.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return true;
+        var user = await _context.Users.Include(s => s.Subfooddits)
+                    .FirstOrDefaultAsync(s => s.Id == userId);
+        if (user == null) {
+            return false;
         }
-        return false;
+
+        var subfooddit = await _context.Subfooddits.FindAsync(subfoodditId);
+        if (subfooddit == null) {
+            return false;
+        }
+
+        if (user.Subfooddits.Contains(subfooddit)) {
+            return false;
+        }
+
+        user.Subfooddits.Add(subfooddit);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> RemoveUserFromSubfooddit(int subfoodditId, int userId)
     {
-        var subfooddit = await _context.Subfooddits
-            .Include(s => s.Users)
-            .FirstOrDefaultAsync(s => s.SubfoodditId == subfoodditId);
-        var user = subfooddit?.Users?.FirstOrDefault(u => u.Id == userId);
-
-        if (subfooddit != null && user != null)
-        {
-            subfooddit.Users?.Remove(user);
-            await _context.SaveChangesAsync();
-            return true;
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) {
+            return false;
         }
-        return false;
+
+        var sub = await _context.Subfooddits.Include(s => s.Users)
+                    .Where(s => s.Users.Contains(user))
+                    .FirstOrDefaultAsync(s => s.SubfoodditId == subfoodditId);
+        if (sub == null) {
+            return false;
+        }
+
+        sub.Users.Remove(user);
+        await _context.SaveChangesAsync();
+        return true;
     }
     public async Task<List<UserSubfoodditDto>> GetSubfoodditsByUserId(int userId)
     {

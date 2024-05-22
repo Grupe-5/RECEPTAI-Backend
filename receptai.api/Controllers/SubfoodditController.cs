@@ -107,26 +107,36 @@ public class SubfoodditController(ISubfoodditRepository subfoodditRepository) : 
 
     [HttpPost("add_user")]
     [Authorize]
-    public async Task<IActionResult> AddUser([FromRoute] int subfoodditId)
+    public async Task<IActionResult> AddUser(int subfoodditId)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         var userId = User.GetId();
         var success = await _subfoodditRepository.AddUserToSubfooddit(subfoodditId, userId);
         if (!success)
         {
-            return NotFound("Subfooddit or user not found.");
+            return NotFound("Subfooddit/user not found, or already added");
         }
         return Ok();
     }
 
     [HttpDelete("remove_user")]
     [Authorize]
-    public async Task<IActionResult> RemoveUser([FromRoute] int subfoodditId)
+    public async Task<IActionResult> RemoveUser(int subfoodditId)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         var userId = User.GetId();
         var success = await _subfoodditRepository.RemoveUserFromSubfooddit(subfoodditId, userId);
         if (!success)
         {
-            return NotFound("Subfooddit or user not found.");
+            return NotFound("Subfooddit/user not found, or not present");
         }
         return NoContent();
     }
