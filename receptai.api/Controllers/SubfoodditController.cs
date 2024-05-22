@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using receptai.api.Dtos.Subfooddit;
 using receptai.api.Extensions;
@@ -9,14 +10,9 @@ namespace receptai.api.Controllers;
 
 [Route("api/subfooddit")]
 [ApiController]
-public class SubfoodditController : ControllerBase
+public class SubfoodditController(ISubfoodditRepository subfoodditRepository) : ControllerBase
 {
-    private readonly ISubfoodditRepository _subfoodditRepository;
-
-    public SubfoodditController(ISubfoodditRepository subfoodditRepository)
-    {
-        _subfoodditRepository = subfoodditRepository;
-    }
+    private readonly ISubfoodditRepository _subfoodditRepository = subfoodditRepository;
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
