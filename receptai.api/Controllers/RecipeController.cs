@@ -91,11 +91,11 @@ public class RecipeController : ControllerBase
 
         var subfoodditName = _subfoodditRepository
             .GetByIdAsync(recipeModel.SubfoodditId).Result?.Title;
-
-        if (subfoodditName is not null)
-        {
-            recipeModel.SubfoodditName = subfoodditName;
+        if (subfoodditName == null) {
+            return BadRequest("Invalid subfooddit");
         }
+
+        recipeModel.SubfoodditName = subfoodditName!;
 
         if (recipeDto.Photo != null && recipeDto.Photo.Length != 0)
         {
