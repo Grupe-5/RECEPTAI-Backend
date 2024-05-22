@@ -100,11 +100,18 @@ public class SubfoodditRepository : ISubfoodditRepository
         }
         return false;
     }
-    public async Task<List<Subfooddit>> GetSubfoodditsByUserId(int userId)
+    public async Task<List<UserSubfoodditDto>> GetSubfoodditsByUserId(int userId)
     {
         return await _context.Users
             .Where(u => u.Id == userId)
             .SelectMany(u => u.Subfooddits)
+            .Select(u => new UserSubfoodditDto
+            {
+                Id = u.SubfoodditId,
+                Title = u.Title,
+                Description = u.Description,
+                CreationDate = u.CreationDate,
+            })
             .ToListAsync();
     }
 
