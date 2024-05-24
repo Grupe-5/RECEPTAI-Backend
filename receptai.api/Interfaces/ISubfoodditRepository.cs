@@ -17,6 +17,6 @@ public interface ISubfoodditRepository
     Task<Subfooddit?> DeleteAsync(int id);
     Task<bool> AddUserToSubfooddit(int subfoodditId, int userId);
     Task<bool> RemoveUserFromSubfooddit(int subfoodditId, int userId);
-    Task<List<UserSubfoodditDto>> GetSubfoodditsByUserId(int userId);
+    Task<List<SubfoodditDto>> GetSubfoodditsByUserId(int userId);
     Task<List<UserSummaryDto>> GetUsersBySubfoodditId(int subfoodditId);
 }

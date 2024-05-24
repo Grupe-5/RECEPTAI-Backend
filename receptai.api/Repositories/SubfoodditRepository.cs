@@ -109,14 +109,14 @@ public class SubfoodditRepository : ISubfoodditRepository
         await _context.SaveChangesAsync();
         return true;
     }
-    public async Task<List<UserSubfoodditDto>> GetSubfoodditsByUserId(int userId)
+    public async Task<List<SubfoodditDto>> GetSubfoodditsByUserId(int userId)
     {
         return await _context.Users
             .Where(u => u.Id == userId)
             .SelectMany(u => u.Subfooddits)
-            .Select(u => new UserSubfoodditDto
+            .Select(u => new SubfoodditDto
             {
-                Id = u.SubfoodditId,
+                SubfoodditId = u.SubfoodditId,
                 Title = u.Title,
                 Description = u.Description,
                 CreationDate = u.CreationDate,
