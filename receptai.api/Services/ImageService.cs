@@ -1,6 +1,7 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace receptai.api;
 
@@ -39,14 +40,14 @@ public class ImageService(IImageRepository imageRepo, IConfiguration configurati
             image.Mutate(x => x.GaussianBlur(20));
         }
 
-        var jpegEncoder = new JpegEncoder
+        var webpEncoder = new WebpEncoder
         {
             Quality = 75
         };
 
         /* Hella inefficient, but w/e (essentially 3-4 copies of image data) */
         using var outputStream = new MemoryStream();
-        await image.SaveAsync(outputStream, jpegEncoder);
+        await image.SaveAsync(outputStream, webpEncoder);
         return await _imageRepo.UploadImageAsync(outputStream.ToArray());
     }
 }
