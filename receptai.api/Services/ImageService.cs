@@ -1,12 +1,14 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace receptai.api;
 
-public class ImageService(IImageRepository imageRepo) : IImageService
+public class ImageService(IImageRepository imageRepo, IConfiguration configuration) : IImageService
 {
     private readonly IImageRepository _imageRepo = imageRepo;
+    private readonly IConfiguration _configuration = configuration;
 
     public async Task<bool> DeleteImageAsync(int imageId)
     {
@@ -31,14 +33,21 @@ public class ImageService(IImageRepository imageRepo) : IImageService
             image.Mutate(x => x.Resize(resizeOptions));
         }
         
-        var jpegEncoder = new JpegEncoder
+        bool? blurImages = _configuration.GetValue<bool>("BlurImages");
+        blurImages ??= false;
+
+        if (blurImages.HasValue) {
+            image.Mutate(x => x.GaussianBlur(20));
+        }
+
+        var webpEncoder = new WebpEncoder
         {
             Quality = 75
         };
 
         /* Hella inefficient, but w/e (essentially 3-4 copies of image data) */
         using var outputStream = new MemoryStream();
-        await image.SaveAsync(outputStream, jpegEncoder);
+        await image.SaveAsync(outputStream, webpEncoder);
         return await _imageRepo.UploadImageAsync(outputStream.ToArray());
     }
 }
