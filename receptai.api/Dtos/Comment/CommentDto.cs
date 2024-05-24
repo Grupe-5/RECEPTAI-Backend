@@ -6,6 +6,7 @@ public class CommentDto
 
     public int RecipeId { get; set; }
 
+    public string UserName { get; set; } = null!;
     public int UserId { get; set; }
 
     public int AggregatedVotes { get; set; }

@@ -39,16 +39,14 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetCommentsByUserId(int userId)
     {
         var comments = await _commentRepository.GetCommentsByUserId(userId);
-
-        return Ok(comments);
+        return Ok(comments.Select(comment => comment.ToCommentDto()));
     }
 
     [HttpGet("by_recipe/{recipeId}")]
     public async Task<IActionResult> GetCommentsByRecipeId(int recipeId)
     {
         var comments = await _commentRepository.GetCommentsByRecipeId(recipeId);
-
-        return Ok(comments);
+        return Ok(comments.Select(comment => comment.ToCommentDto()));
     }
 
     [HttpGet("aggregated_votes/{id:int}")]

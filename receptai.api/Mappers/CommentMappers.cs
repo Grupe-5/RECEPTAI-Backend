@@ -11,6 +11,7 @@ public static class CommentMappers
         {
             CommentId = commentModel.CommentId,
             RecipeId = commentModel.RecipeId,
+            UserName = commentModel.User.UserName!,
             UserId = commentModel.UserId,
             AggregatedVotes = commentModel.AggregatedVotes,
             CommentText = commentModel.CommentText,
