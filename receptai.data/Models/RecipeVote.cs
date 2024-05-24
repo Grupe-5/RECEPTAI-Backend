@@ -17,7 +17,7 @@ public class RecipeVote
     public VoteType VoteType { get; set; }
 
     [Required]
-    public DateTime VoteDate { get; set; } = DateTime.Now;
+    public DateTime VoteDate { get; set; } = DateTime.UtcNow;
 
     public virtual User User { get; set; } = null!;
     public virtual Recipe Recipe { get; set; } = null!;

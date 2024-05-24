@@ -23,7 +23,6 @@ public static class RecipeVoteMappers
         {
             RecipeId = recipeVoteModel.RecipeId,
             VoteType = recipeVoteModel.VoteType,
-            VoteDate = recipeVoteModel.VoteDate
         };
     }
 

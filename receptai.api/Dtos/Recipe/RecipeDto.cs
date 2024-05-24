@@ -1,4 +1,6 @@
-﻿namespace receptai.api.Dtos.Recipe;
+﻿using receptai.data;
+
+namespace receptai.api.Dtos.Recipe;
 
 public class RecipeDto
 {
@@ -29,4 +31,7 @@ public class RecipeDto
     public int CookingDifficulty { get; set; }
 
     public string? Instructions { get; set; } = null!;
+
+    // Non-null if user logged in & voted for this recipe
+    public VoteType? Vote { get; set; } = null;
 }

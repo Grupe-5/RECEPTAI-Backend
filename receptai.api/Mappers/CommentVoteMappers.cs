@@ -23,7 +23,7 @@ public static class CommentVoteMappers
         {
             CommentId = commentVoteModel.CommentId,
             VoteType = commentVoteModel.VoteType,
-            VoteDate = commentVoteModel.VoteDate
+            VoteDate = DateTime.UtcNow,
         };
     }
 

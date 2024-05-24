@@ -1,4 +1,6 @@
-﻿namespace receptai.api.Dtos.Comment;
+﻿using receptai.data;
+
+namespace receptai.api.Dtos.Comment;
 
 public class CommentDto
 {
@@ -14,4 +16,7 @@ public class CommentDto
     public string CommentText { get; set; } = null!;
 
     public DateTime CommentDate { get; set; }
+
+    // Non-null if user logged in & voted for this comment
+    public VoteType? Vote { get; set; } = null;
 }
