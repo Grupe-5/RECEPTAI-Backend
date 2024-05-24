@@ -90,6 +90,8 @@ builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddMemoryCache();
 builder.Services.Decorate<IImageRepository, CachedImageRepository>();
 
+builder.Services.AddLogging();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -100,6 +102,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<LoggingMiddleware>();
 
 app.UseCors(x => x
     .AllowAnyOrigin()
