@@ -47,6 +47,7 @@ public class CommentRepository : ICommentRepository
     {
         return await _context.Comments
             .Where(c => c.UserId == userId)
+            .Include(c => c.User)
             .ToListAsync();
     }
 
@@ -54,6 +55,7 @@ public class CommentRepository : ICommentRepository
     {
         return await _context.Comments
             .Where(c => c.RecipeId == recipeId)
+            .Include(c => c.User)
             .ToListAsync();
     }
 
@@ -61,6 +63,7 @@ public class CommentRepository : ICommentRepository
         UpdateCommentRequestDto commentDto)
     {
         var existingComment = await _context.Comments
+            .Include(c => c.User)
             .FirstOrDefaultAsync(c => c.CommentId == id);
 
         if (existingComment is null)
