@@ -4,9 +4,10 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace receptai.api;
 
-public class ImageService(IImageRepository imageRepo) : IImageService
+public class ImageService(IImageRepository imageRepo, IConfiguration configuration) : IImageService
 {
     private readonly IImageRepository _imageRepo = imageRepo;
+    private readonly IConfiguration _configuration = configuration;
 
     public async Task<bool> DeleteImageAsync(int imageId)
     {
@@ -31,6 +32,13 @@ public class ImageService(IImageRepository imageRepo) : IImageService
             image.Mutate(x => x.Resize(resizeOptions));
         }
         
+        bool? blurImages = _configuration.GetValue<bool>("BlurImages");
+        blurImages ??= false;
+
+        if (blurImages.HasValue) {
+            image.Mutate(x => x.GaussianBlur(20));
+        }
+
         var jpegEncoder = new JpegEncoder
         {
             Quality = 75
