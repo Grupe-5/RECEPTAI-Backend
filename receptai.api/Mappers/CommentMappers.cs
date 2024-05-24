@@ -25,7 +25,7 @@ public static class CommentMappers
         {
             RecipeId = commentModel.RecipeId,
             CommentText = commentModel.CommentText,
-            CommentDate = commentModel.CommentDate
+            CommentDate = DateTime.UtcNow, 
         };
     }
 }

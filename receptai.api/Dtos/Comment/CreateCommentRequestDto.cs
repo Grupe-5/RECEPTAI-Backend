@@ -10,7 +10,4 @@ public class CreateCommentRequestDto
     [Required]
     [MaxLength(1000, ErrorMessage = "Comment may not be longer than 1000 characters!")]
     public string CommentText { get; set; } = null!;
-
-    [Required]
-    public DateTime CommentDate { get; set; }
 }
