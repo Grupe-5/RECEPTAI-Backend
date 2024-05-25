@@ -23,8 +23,10 @@ public class CommentController : ControllerBase
         _commentVoteRepository = commentVoteRepository;
     }
 
-    private async Task<VoteType?> GetVoteInfo(int commentId) {
-        if (!(User.Identity?.IsAuthenticated ?? false)) {
+    private async Task<VoteType?> GetVoteInfo(int commentId)
+    {
+        if (!(User.Identity?.IsAuthenticated ?? false))
+        {
             return null;
         }
 
@@ -49,7 +51,7 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetCommentsByUserId(int userId)
     {
         var comments = await _commentRepository.GetCommentsByUserId(userId);
-        var commentDtos = await Task.WhenAll(comments.Select(async comment => 
+        var commentDtos = await Task.WhenAll(comments.Select(async comment =>
         {
             var voteInfo = await GetVoteInfo(comment.CommentId);
             return comment.ToCommentDto(voteInfo);
@@ -61,7 +63,7 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetCommentsByRecipeId(int recipeId)
     {
         var comments = await _commentRepository.GetCommentsByRecipeId(recipeId);
-        var commentDtos = await Task.WhenAll(comments.Select(async comment => 
+        var commentDtos = await Task.WhenAll(comments.Select(async comment =>
         {
             var voteInfo = await GetVoteInfo(comment.CommentId);
             return comment.ToCommentDto(voteInfo);
@@ -91,7 +93,10 @@ public class CommentController : ControllerBase
 
         var commentModel = commentDto.ToCommentFromCreateDto();
 
+        commentModel.UserName = User.GetUsername();
         commentModel.UserId = User.GetId();
+        commentModel.Version = Guid.NewGuid();
+
         await _commentRepository.CreateAsync(commentModel);
 
         return CreatedAtAction(nameof(GetById),
@@ -109,9 +114,18 @@ public class CommentController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var commentModel = await _commentRepository
-            .UpdateAsync(id, commentDto);
+        Comment? commentModel;
 
+        try
+        {
+            commentModel = await _commentRepository
+                .UpdateAsync(id, commentDto);
+        }
+        catch
+        {
+            return Conflict("A concurrency conflict while updating the comment has occured.");
+        }
+        
         if (commentModel is null)
         {
             return NotFound();

@@ -16,6 +16,8 @@ public class Comment
     [ForeignKey("User")]
     public int UserId { get; set; }
 
+    public string UserName { get; set; } = null!;
+
     public int AggregatedVotes { get; set; }
 
     [Required]
@@ -28,4 +30,6 @@ public class Comment
     public virtual Recipe Recipe { get; set; } = null!;
     public virtual User User { get; set; } = null!;
     public virtual ICollection<CommentVote>? Votes { get; set; }
+
+    public Guid Version { get; set; }
 }
