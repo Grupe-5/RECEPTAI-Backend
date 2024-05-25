@@ -9,6 +9,7 @@ public class CommentDto
     public int RecipeId { get; set; }
 
     public string UserName { get; set; } = null!;
+
     public int UserId { get; set; }
 
     public int AggregatedVotes { get; set; }
@@ -19,4 +20,6 @@ public class CommentDto
 
     // Non-null if user logged in & voted for this comment
     public VoteType? Vote { get; set; } = null;
+
+    public Guid Version { get; set; }
 }

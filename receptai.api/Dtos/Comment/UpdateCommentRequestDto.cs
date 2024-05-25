@@ -9,5 +9,5 @@ public class UpdateCommentRequestDto
     public string CommentText { get; set; } = null!;
 
     [Required]
-    public DateTime CommentDate { get; set; }
+    public Guid Version { get; set; }
 }

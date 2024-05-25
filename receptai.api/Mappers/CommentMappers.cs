@@ -11,12 +11,13 @@ public static class CommentMappers
         {
             CommentId = commentModel.CommentId,
             RecipeId = commentModel.RecipeId,
-            UserName = commentModel.User.UserName!,
+            UserName = commentModel.UserName,
             UserId = commentModel.UserId,
             AggregatedVotes = commentModel.AggregatedVotes,
             CommentText = commentModel.CommentText,
             CommentDate = commentModel.CommentDate,
-            Vote = vote
+            Vote = vote,
+            Version = commentModel.Version
         };
     }
 
@@ -27,7 +28,8 @@ public static class CommentMappers
         {
             RecipeId = commentModel.RecipeId,
             CommentText = commentModel.CommentText,
-            CommentDate = DateTime.UtcNow, 
+            CommentDate = DateTime.UtcNow,
+            Version = Guid.NewGuid()
         };
     }
 }

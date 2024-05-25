@@ -71,10 +71,17 @@ public class CommentRepository : ICommentRepository
             return null;
         }
 
-        existingComment.CommentText = commentDto.CommentText;
-        existingComment.CommentDate = commentDto.CommentDate;
-
-        await _context.SaveChangesAsync();
+        if (existingComment.Version == commentDto.Version)
+        {
+            existingComment.CommentText = commentDto.CommentText;
+            existingComment.Version = Guid.NewGuid();
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            throw new DbUpdateConcurrencyException(
+                "A concurrency conflict while updating the comment has occured.");
+        }
 
         return existingComment;
     }
