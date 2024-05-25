@@ -5,6 +5,7 @@ using receptai.api.Extensions;
 using receptai.api.Interfaces;
 using receptai.api.Mappers;
 using receptai.api.Repositories;
+using receptai.data;
 
 namespace receptai.api.Controllers;
 
@@ -22,6 +23,15 @@ public class CommentController : ControllerBase
         _commentVoteRepository = commentVoteRepository;
     }
 
+    private async Task<VoteType?> GetVoteInfo(int commentId) {
+        if (!(User.Identity?.IsAuthenticated ?? false)) {
+            return null;
+        }
+
+        var commentVote = await _commentVoteRepository.GetByUserAndCommentId(User.GetId(), commentId);
+        return commentVote?.VoteType;
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
@@ -32,21 +42,31 @@ public class CommentController : ControllerBase
             return NotFound();
         }
 
-        return Ok(comment.ToCommentDto());
+        return Ok(comment.ToCommentDto(await GetVoteInfo(comment.CommentId)));
     }
 
     [HttpGet("by_user/{userId}")]
     public async Task<IActionResult> GetCommentsByUserId(int userId)
     {
         var comments = await _commentRepository.GetCommentsByUserId(userId);
-        return Ok(comments.Select(comment => comment.ToCommentDto()));
+        var commentDtos = await Task.WhenAll(comments.Select(async comment => 
+        {
+            var voteInfo = await GetVoteInfo(comment.CommentId);
+            return comment.ToCommentDto(voteInfo);
+        }));
+        return Ok(commentDtos);
     }
 
     [HttpGet("by_recipe/{recipeId}")]
     public async Task<IActionResult> GetCommentsByRecipeId(int recipeId)
     {
         var comments = await _commentRepository.GetCommentsByRecipeId(recipeId);
-        return Ok(comments.Select(comment => comment.ToCommentDto()));
+        var commentDtos = await Task.WhenAll(comments.Select(async comment => 
+        {
+            var voteInfo = await GetVoteInfo(comment.CommentId);
+            return comment.ToCommentDto(voteInfo);
+        }));
+        return Ok(commentDtos);
     }
 
     [HttpGet("aggregated_votes/{id:int}")]

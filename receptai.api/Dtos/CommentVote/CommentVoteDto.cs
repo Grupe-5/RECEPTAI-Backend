@@ -10,5 +10,5 @@ public class CommentVoteDto
 
     public VoteType VoteType { get; set; }
 
-    public DateTime VoteDate { get; set; } = DateTime.Now;
+    public DateTime VoteDate { get; set; }
 }

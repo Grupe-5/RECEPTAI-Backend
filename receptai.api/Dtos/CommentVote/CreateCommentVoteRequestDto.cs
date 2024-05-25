@@ -12,7 +12,4 @@ public class CreateCommentVoteRequestDto
 
     [Required]
     public VoteType VoteType { get; set; }
-
-    [Required]
-    public DateTime VoteDate { get; set; } = DateTime.Now;
 }

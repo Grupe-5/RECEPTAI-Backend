@@ -5,7 +5,7 @@ namespace receptai.api.Mappers;
 
 public static class RecipeMappers
 {
-    public static RecipeDto ToRecipeDto(this Recipe recipeModel)
+    public static RecipeDto ToRecipeDto(this Recipe recipeModel, VoteType? vote = null)
     {
         return new RecipeDto
         {
@@ -22,7 +22,8 @@ public static class RecipeMappers
             Servings = recipeModel.Servings,
             DatePosted = recipeModel.DatePosted,
             CookingDifficulty = recipeModel.CookingDifficulty,
-            Instructions = recipeModel.Instructions
+            Instructions = recipeModel.Instructions,
+            Vote = vote
         };
     }
 
