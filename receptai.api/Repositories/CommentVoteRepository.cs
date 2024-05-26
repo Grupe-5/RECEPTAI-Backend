@@ -9,12 +9,14 @@ public class CommentVoteRepository : ICommentVoteRepository
 {
     private readonly RecipePlatformDbContext _context;
     private readonly ICommentRepository _commentRepository;
+    private readonly IUserRepository _userRepository;
 
     public CommentVoteRepository(RecipePlatformDbContext context,
-        ICommentRepository commentRepository)
+        ICommentRepository commentRepository, IUserRepository userRepository)
     {
         _context = context;
         _commentRepository = commentRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<CommentVote?> GetByUserAndCommentId(int userId, int commentId)
@@ -40,8 +42,8 @@ public class CommentVoteRepository : ICommentVoteRepository
         await _context.CommentVotes.AddAsync(commentVoteModel);
         await _context.SaveChangesAsync();
 
-        await _commentRepository.RecalculateVotesAsync(
-            commentVoteModel.CommentId);
+        await _commentRepository.RecalculateVotesAsync(commentVoteModel.CommentId);
+        await _userRepository.RecalculateKarmaScoreAsync(commentVoteModel.UserId);
 
         return commentVoteModel;
     }
@@ -61,6 +63,7 @@ public class CommentVoteRepository : ICommentVoteRepository
         await _context.SaveChangesAsync();
 
         await _commentRepository.RecalculateVotesAsync(commentId);
+        await _userRepository.RecalculateKarmaScoreAsync(userId);
 
         return commentVoteModel;
     }
@@ -90,6 +93,7 @@ public class CommentVoteRepository : ICommentVoteRepository
 
         await _context.SaveChangesAsync();
         await _commentRepository.RecalculateVotesAsync(commentId);
+        await _userRepository.RecalculateKarmaScoreAsync(userId);
 
         return existingCommentVote;
     }
