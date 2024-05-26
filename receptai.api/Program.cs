@@ -87,6 +87,7 @@ builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IRecipeVoteRepository, RecipeVoteRepository>();
 builder.Services.AddScoped<ICommentVoteRepository, CommentVoteRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddSingleton<ITokenService, TokenService>();
 

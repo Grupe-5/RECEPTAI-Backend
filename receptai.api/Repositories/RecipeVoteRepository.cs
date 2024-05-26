@@ -9,12 +9,14 @@ public class RecipeVoteRepository : IRecipeVoteRepository
 {
     private readonly RecipePlatformDbContext _context;
     private readonly IRecipeRepository _recipeRepository;
+    private readonly IUserRepository _userRepository;
 
     public RecipeVoteRepository(RecipePlatformDbContext context,
-        IRecipeRepository recipeRepository)
+        IRecipeRepository recipeRepository, IUserRepository userRepository)
     {
         _context = context;
         _recipeRepository = recipeRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<RecipeVote?> GetByUserAndRecipeId(int userId, int recipeId)
@@ -35,13 +37,13 @@ public class RecipeVoteRepository : IRecipeVoteRepository
         return recipeVoteModels;
     }
 
-    public async Task<RecipeVote> CreateAsync(RecipeVote recipeVoteModel)
+    public async Task<RecipeVote> CreateAsync(RecipeVote recipeVoteModel, int userId)
     {
         await _context.RecipeVotes.AddAsync(recipeVoteModel);
         await _context.SaveChangesAsync();
 
-        await _recipeRepository.RecalculateVotesAsync(
-            recipeVoteModel.RecipeId);
+        await _recipeRepository.RecalculateVotesAsync(recipeVoteModel.RecipeId);
+        await _userRepository.RecalculateKarmaScoreAsync(userId);
 
         return recipeVoteModel;
     }
@@ -61,6 +63,7 @@ public class RecipeVoteRepository : IRecipeVoteRepository
         await _context.SaveChangesAsync();
 
         await _recipeRepository.RecalculateVotesAsync(recipeId);
+        await _userRepository.RecalculateKarmaScoreAsync(userId);
 
         return recipeVoteModel;
     }
@@ -90,6 +93,7 @@ public class RecipeVoteRepository : IRecipeVoteRepository
 
         await _context.SaveChangesAsync();
         await _recipeRepository.RecalculateVotesAsync(recipeId);
+        await _userRepository.RecalculateKarmaScoreAsync(userId);
 
         return existingRecipeVote;
     }

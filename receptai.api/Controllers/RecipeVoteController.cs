@@ -64,7 +64,7 @@ public class RecipeVoteController : ControllerBase
 
         var recipeVoteModel = recipeVoteDto.ToRecipeVoteFromCreateDto();
         recipeVoteModel.UserId = User.GetId();
-        await _recipeVoteRepository.CreateAsync(recipeVoteModel);
+        await _recipeVoteRepository.CreateAsync(recipeVoteModel, User.GetId());
 
         return CreatedAtAction(
             nameof(GetByUserAndRecipeId),

@@ -7,7 +7,7 @@ public interface ICommentVoteRepository
 {
     Task<CommentVote?> GetByUserAndCommentId(int userId, int commentId);
 
-    Task<CommentVote> CreateAsync(CommentVote recipeVoteModel);
+    Task<CommentVote> CreateAsync(CommentVote recipeVoteModel, int userId);
 
     Task<CommentVote?> UpdateAsync(int userId, int commentId,
         UpdateCommentVoteRequestDto commentVoteDto);

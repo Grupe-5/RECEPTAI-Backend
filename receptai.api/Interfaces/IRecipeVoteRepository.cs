@@ -7,7 +7,7 @@ public interface IRecipeVoteRepository
 {
     Task<RecipeVote?> GetByUserAndRecipeId(int userId, int recipeId);
 
-    Task<RecipeVote> CreateAsync(RecipeVote recipeVoteModel);
+    Task<RecipeVote> CreateAsync(RecipeVote recipeVoteModel, int userId);
 
     Task<RecipeVote?> UpdateAsync(int userId, int recipeId,
         UpdateRecipeVoteRequestDto recipeVoteDto);
