@@ -37,13 +37,13 @@ public class CommentVoteRepository : ICommentVoteRepository
         return commentVoteModels;
     }
 
-    public async Task<CommentVote> CreateAsync(CommentVote commentVoteModel, int userId)
+    public async Task<CommentVote> CreateAsync(CommentVote commentVoteModel)
     {
         await _context.CommentVotes.AddAsync(commentVoteModel);
         await _context.SaveChangesAsync();
 
         await _commentRepository.RecalculateVotesAsync(commentVoteModel.CommentId);
-        await _userRepository.RecalculateKarmaScoreAsync(userId);
+        await _userRepository.RecalculateKarmaScoreAsync(commentVoteModel.UserId);
 
         return commentVoteModel;
     }

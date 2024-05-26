@@ -64,7 +64,7 @@ public class CommentVoteController : ControllerBase
 
         var commentVoteModel = commentVoteDto.ToCommentVoteFromCreateDto();
         commentVoteModel.UserId = User.GetId();
-        await _commentVoteRepository.CreateAsync(commentVoteModel, User.GetId());
+        await _commentVoteRepository.CreateAsync(commentVoteModel);
 
         return CreatedAtAction(
             nameof(GetByUserAndCommentId),

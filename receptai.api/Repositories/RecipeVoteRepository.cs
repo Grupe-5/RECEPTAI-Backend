@@ -37,13 +37,13 @@ public class RecipeVoteRepository : IRecipeVoteRepository
         return recipeVoteModels;
     }
 
-    public async Task<RecipeVote> CreateAsync(RecipeVote recipeVoteModel, int userId)
+    public async Task<RecipeVote> CreateAsync(RecipeVote recipeVoteModel)
     {
         await _context.RecipeVotes.AddAsync(recipeVoteModel);
         await _context.SaveChangesAsync();
 
         await _recipeRepository.RecalculateVotesAsync(recipeVoteModel.RecipeId);
-        await _userRepository.RecalculateKarmaScoreAsync(userId);
+        await _userRepository.RecalculateKarmaScoreAsync(recipeVoteModel.UserId);
 
         return recipeVoteModel;
     }
