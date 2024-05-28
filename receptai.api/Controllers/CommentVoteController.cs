@@ -62,8 +62,16 @@ public class CommentVoteController : ControllerBase
             return BadRequest(ModelState);
         }
 
+        var userId = User.GetId();
+        var existingVote = await _commentVoteRepository.GetByUserAndCommentId(userId, commentVoteDto.CommentId);
+
+        if (existingVote != null)
+        {
+            return Conflict(new { message = "User has already voted on this comment." });
+        }
+
         var commentVoteModel = commentVoteDto.ToCommentVoteFromCreateDto();
-        commentVoteModel.UserId = User.GetId();
+        commentVoteModel.UserId = userId;
         await _commentVoteRepository.CreateAsync(commentVoteModel);
 
         return CreatedAtAction(
