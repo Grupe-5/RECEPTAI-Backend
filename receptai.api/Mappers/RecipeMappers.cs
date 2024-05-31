@@ -11,7 +11,7 @@ public static class RecipeMappers
         {
             RecipeId = recipeModel.RecipeId,
             UserId = recipeModel.UserId,
-            UserName = recipeModel.UserName,
+            UserName = recipeModel.User.UserName!,
             Title = recipeModel.Title,
             AggregatedVotes = recipeModel.AggregatedVotes,
             ImgId = recipeModel.ImgId,

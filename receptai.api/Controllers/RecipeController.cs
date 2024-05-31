@@ -154,7 +154,6 @@ public class RecipeController : ControllerBase
         }
 
         recipeModel.UserId = User.GetId();
-        recipeModel.UserName = User.GetUsername();
 
         try {
             await _recipeRepository.CreateAsync(recipeModel);
