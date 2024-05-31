@@ -93,7 +93,6 @@ public class CommentController : ControllerBase
 
         var commentModel = commentDto.ToCommentFromCreateDto();
 
-        commentModel.UserName = User.GetUsername();
         commentModel.UserId = User.GetId();
         commentModel.Version = Guid.NewGuid();
 

@@ -34,4 +34,7 @@ public class RecipeDto
 
     // Non-null if user logged in & voted for this recipe
     public VoteType? Vote { get; set; } = null;
+
+    // Comment count on recipe
+    public int? CommentCount { get; set; } = null;
 }

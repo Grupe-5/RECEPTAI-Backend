@@ -5,13 +5,13 @@ namespace receptai.api.Mappers;
 
 public static class RecipeMappers
 {
-    public static RecipeDto ToRecipeDto(this Recipe recipeModel, VoteType? vote = null)
+    public static RecipeDto ToRecipeDto(this Recipe recipeModel, VoteType? vote = null, int? commentCount = null)
     {
         return new RecipeDto
         {
             RecipeId = recipeModel.RecipeId,
             UserId = recipeModel.UserId,
-            UserName = recipeModel.UserName,
+            UserName = recipeModel.User.UserName!,
             Title = recipeModel.Title,
             AggregatedVotes = recipeModel.AggregatedVotes,
             ImgId = recipeModel.ImgId,
@@ -23,7 +23,8 @@ public static class RecipeMappers
             DatePosted = recipeModel.DatePosted,
             CookingDifficulty = recipeModel.CookingDifficulty,
             Instructions = recipeModel.Instructions,
-            Vote = vote
+            Vote = vote,
+            CommentCount = commentCount,
         };
     }
 

@@ -16,18 +16,21 @@ public class RecipeController : ControllerBase
     private readonly IRecipeRepository _recipeRepository;
     private readonly IRecipeVoteRepository _recipeVoteRepository;
     private readonly ISubfoodditRepository _subfoodditRepository;
+    private readonly ICommentRepository _commentRepository;
     private readonly IImageService _imageService;
     private readonly UserManager<User> _userManager;
 
     public RecipeController(IRecipeRepository recipeRepository,
         IRecipeVoteRepository recipeVoteRepository,
         ISubfoodditRepository subfoodditRepository,
+        ICommentRepository commentRepository,
         IImageService imageService,
         UserManager<User> userManager)
     {
         _recipeRepository = recipeRepository;
         _recipeVoteRepository = recipeVoteRepository;
         _subfoodditRepository = subfoodditRepository;
+        _commentRepository = commentRepository;
         _imageService = imageService;
         _userManager = userManager;
     }
@@ -41,17 +44,25 @@ public class RecipeController : ControllerBase
         return commentVote?.VoteType;
     }
 
+    private async Task<IEnumerable<RecipeDto>> ConvertToRecipeDto(IEnumerable<Recipe> recipes) {
+        if (recipes == null) {
+            return [];
+        }
+
+        var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
+        {
+            var voteInfo = await GetVoteInfo(recipe.RecipeId);
+            var commentCount = await _commentRepository.GetCommentCountByRecipeId(recipe.RecipeId);
+            return recipe.ToRecipeDto(voteInfo, commentCount);
+        }));
+        return recipeDto;
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery] RecipeSortEnum sort = RecipeSortEnum.ByPostDate, [FromQuery] bool asc = false)
     {
         var recipes = await _recipeRepository.GetAllAsync(offset, limit, sort);
-        var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
-        {
-            var voteInfo = await GetVoteInfo(recipe.RecipeId);
-            return recipe.ToRecipeDto(voteInfo);
-        }));
-
-        return Ok(recipeDto);
+        return Ok(await ConvertToRecipeDto(recipes));
     }
 
     [HttpGet("me")]
@@ -60,13 +71,7 @@ public class RecipeController : ControllerBase
     {
         var user = await _userManager.GetUserAsync(User);
         var recipes = await _recipeRepository.GetJoinedAsync(user!, offset, limit, sort);
-        var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
-        {
-            var voteInfo = await GetVoteInfo(recipe.RecipeId);
-            return recipe.ToRecipeDto(voteInfo);
-        }));
-
-        return Ok(recipeDto);
+        return Ok(await ConvertToRecipeDto(recipes));
     }
 
     [HttpGet("{id:int}")]
@@ -79,31 +84,21 @@ public class RecipeController : ControllerBase
             return NotFound();
         }
 
-        return Ok(recipe.ToRecipeDto(await GetVoteInfo(recipe.RecipeId)));
+        return Ok((await ConvertToRecipeDto([recipe])).First());
     }
 
     [HttpGet("by_user/{userId}")]
     public async Task<IActionResult> GetRecipesByUserId(int userId, [FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery] RecipeSortEnum sort = RecipeSortEnum.ByPostDate, [FromQuery] bool asc = false)
     {
         var recipes = await _recipeRepository.GetRecipesByUserId(userId, offset, limit, sort, asc);
-        var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
-        {
-            var voteInfo = await GetVoteInfo(recipe.RecipeId);
-            return recipe.ToRecipeDto(voteInfo);
-        }));
-        return Ok(recipeDto);
+        return Ok(await ConvertToRecipeDto(recipes));
     }
 
     [HttpGet("by_subfooddit/{subfoodditId}")]
     public async Task<IActionResult> GetRecipesBySubfoodditId(int subfoodditId, [FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery] RecipeSortEnum sort = RecipeSortEnum.ByPostDate, [FromQuery] bool asc = false)
     {
         var recipes = await _recipeRepository.GetRecipesBySubfoodditId(subfoodditId, offset, limit, sort, asc);
-        var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
-        {
-            var voteInfo = await GetVoteInfo(recipe.RecipeId);
-            return recipe.ToRecipeDto(voteInfo);
-        }));
-        return Ok(recipeDto);
+        return Ok(await ConvertToRecipeDto(recipes));
     }
 
     [HttpGet("aggregated_votes/{id:int}")]
@@ -154,7 +149,6 @@ public class RecipeController : ControllerBase
         }
 
         recipeModel.UserId = User.GetId();
-        recipeModel.UserName = User.GetUsername();
 
         try {
             await _recipeRepository.CreateAsync(recipeModel);

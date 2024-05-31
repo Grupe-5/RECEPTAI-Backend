@@ -12,8 +12,6 @@ public class Recipe
     [ForeignKey("User")]
     public int UserId { get; set; }
 
-    public string UserName { get; set; } = null!;
-
     public int AggregatedVotes { get; set; }
 
     [Required]

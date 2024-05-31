@@ -25,6 +25,7 @@ public class CommentRepository : ICommentRepository
     public async Task<Comment?> DeleteAsync(int id)
     {
         var commentModel = await _context.Comments
+            .Include(i => i.User)
             .FirstOrDefaultAsync(c => c.CommentId == id);
 
         if (commentModel is null)
@@ -40,7 +41,7 @@ public class CommentRepository : ICommentRepository
 
     public async Task<Comment?> GetByIdAsync(int id)
     {
-        return await _context.Comments.FindAsync(id);
+        return await _context.Comments.Include(i => i.User).FirstOrDefaultAsync(i => i.CommentId == id);
     }
 
     public async Task<List<Comment>> GetCommentsByUserId(int userId)
@@ -57,6 +58,13 @@ public class CommentRepository : ICommentRepository
             .Where(c => c.RecipeId == recipeId)
             .Include(c => c.User)
             .ToListAsync();
+    }
+
+    public async Task<int> GetCommentCountByRecipeId(int recipeId)
+    {
+        return await _context.Comments
+            .Where(c => c.RecipeId == recipeId)
+            .CountAsync();
     }
 
     public async Task<Comment?> UpdateAsync(int id,
