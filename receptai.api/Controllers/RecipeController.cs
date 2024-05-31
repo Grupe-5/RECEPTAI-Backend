@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using receptai.api.Dtos.Recipe;
 using receptai.api.Extensions;
@@ -16,16 +17,19 @@ public class RecipeController : ControllerBase
     private readonly IRecipeVoteRepository _recipeVoteRepository;
     private readonly ISubfoodditRepository _subfoodditRepository;
     private readonly IImageService _imageService;
+    private readonly UserManager<User> _userManager;
 
     public RecipeController(IRecipeRepository recipeRepository,
         IRecipeVoteRepository recipeVoteRepository,
         ISubfoodditRepository subfoodditRepository,
-        IImageService imageService)
+        IImageService imageService,
+        UserManager<User> userManager)
     {
         _recipeRepository = recipeRepository;
         _recipeVoteRepository = recipeVoteRepository;
         _subfoodditRepository = subfoodditRepository;
         _imageService = imageService;
+        _userManager = userManager;
     }
 
     private async Task<VoteType?> GetVoteInfo(int recipeId) {
@@ -38,9 +42,24 @@ public class RecipeController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int offset = 0, [FromQuery] int limit = 10)
+    public async Task<IActionResult> GetAll([FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery] RecipeSortEnum sort = RecipeSortEnum.ByPostDate, [FromQuery] bool asc = false)
     {
-        var recipes = await _recipeRepository.GetAllAsync(offset, limit);
+        var recipes = await _recipeRepository.GetAllAsync(offset, limit, sort);
+        var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
+        {
+            var voteInfo = await GetVoteInfo(recipe.RecipeId);
+            return recipe.ToRecipeDto(voteInfo);
+        }));
+
+        return Ok(recipeDto);
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> GetJoined([FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery] RecipeSortEnum sort = RecipeSortEnum.ByPostDate, [FromQuery] bool asc = false)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var recipes = await _recipeRepository.GetJoinedAsync(user!, offset, limit, sort);
         var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
         {
             var voteInfo = await GetVoteInfo(recipe.RecipeId);
@@ -64,9 +83,9 @@ public class RecipeController : ControllerBase
     }
 
     [HttpGet("by_user/{userId}")]
-    public async Task<IActionResult> GetRecipesByUserId(int userId, [FromQuery] int offset = 0, [FromQuery] int limit = 10)
+    public async Task<IActionResult> GetRecipesByUserId(int userId, [FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery] RecipeSortEnum sort = RecipeSortEnum.ByPostDate, [FromQuery] bool asc = false)
     {
-        var recipes = await _recipeRepository.GetRecipesByUserId(userId, offset, limit);
+        var recipes = await _recipeRepository.GetRecipesByUserId(userId, offset, limit, sort, asc);
         var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
         {
             var voteInfo = await GetVoteInfo(recipe.RecipeId);
@@ -76,9 +95,9 @@ public class RecipeController : ControllerBase
     }
 
     [HttpGet("by_subfooddit/{subfoodditId}")]
-    public async Task<IActionResult> GetRecipesBySubfoodditId(int subfoodditId, [FromQuery] int offset = 0, [FromQuery] int limit = 10)
+    public async Task<IActionResult> GetRecipesBySubfoodditId(int subfoodditId, [FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery] RecipeSortEnum sort = RecipeSortEnum.ByPostDate, [FromQuery] bool asc = false)
     {
-        var recipes = await _recipeRepository.GetRecipesBySubfoodditId(subfoodditId, offset, limit);
+        var recipes = await _recipeRepository.GetRecipesBySubfoodditId(subfoodditId, offset, limit, sort, asc);
         var recipeDto = await Task.WhenAll(recipes.Select(async recipe => 
         {
             var voteInfo = await GetVoteInfo(recipe.RecipeId);

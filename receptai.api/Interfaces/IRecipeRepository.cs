@@ -3,9 +3,16 @@ using receptai.data;
 
 namespace receptai.api.Interfaces;
 
+public enum RecipeSortEnum {
+    ByPostDate,
+    ByKarma
+};
+
 public interface IRecipeRepository
 {
-    Task<List<Recipe>> GetAllAsync(int offset = 0, int limit = 50);
+    Task<List<Recipe>> GetAllAsync(int offset = 0, int limit = 50, RecipeSortEnum sort = RecipeSortEnum.ByPostDate, bool asc = false);
+
+    Task<List<Recipe>> GetJoinedAsync(User user, int offset = 0, int limit = 50, RecipeSortEnum sort = RecipeSortEnum.ByPostDate, bool asc = false);
 
     Task<Recipe?> GetByIdAsync(int id);
 
@@ -18,7 +25,7 @@ public interface IRecipeRepository
 
     Task<int> RecalculateVotesAsync(int recipeId);
 
-    Task<List<Recipe>> GetRecipesByUserId(int userId, int offset = 0, int limit = 50);
+    Task<List<Recipe>> GetRecipesByUserId(int userId, int offset = 0, int limit = 50, RecipeSortEnum sort = RecipeSortEnum.ByPostDate, bool asc = false);
 
-    Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId, int offset = 0, int limit = 50);
+    Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId, int offset = 0, int limit = 50, RecipeSortEnum sort = RecipeSortEnum.ByPostDate, bool asc = false);
 }
