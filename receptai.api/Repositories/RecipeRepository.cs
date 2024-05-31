@@ -38,12 +38,45 @@ public class RecipeRepository : IRecipeRepository
         return recipeModel;
     }
 
-    public async Task<List<Recipe>> GetAllAsync(int offset = 0, int limit = 10)
+    private IOrderedQueryable<Recipe> getRecipeSort(RecipeSortEnum sort, bool asc)
+    {
+        switch (sort) {
+            case RecipeSortEnum.ByPostDate:
+                if (asc) {
+                    return _context.Recipes.OrderBy(r => r.DatePosted);
+                } else {
+                    return _context.Recipes.OrderByDescending(r => r.DatePosted);
+                }
+            case RecipeSortEnum.ByKarma:
+                if (asc) {
+                    return _context.Recipes.OrderBy(r => r.AggregatedVotes);
+                } else {
+                    return _context.Recipes.OrderByDescending(r => r.AggregatedVotes);
+                }
+            default:
+                throw new ArgumentException("Invalid sort");
+        }
+    }
+
+    public async Task<List<Recipe>> GetAllAsync(int offset = 0, int limit = 10, RecipeSortEnum sort = RecipeSortEnum.ByPostDate, bool asc = false)
     {
         if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset should be greater than or equal to 0.");
         if (limit < 1) throw new ArgumentOutOfRangeException(nameof(limit), "Limit should be greater than or equal to 1.");
 
-        return await _context.Recipes
+        return await getRecipeSort(sort, asc)
+            .Skip(offset)
+            .Take(limit)
+            .ToListAsync();
+    }
+
+    public async Task<List<Recipe>> GetJoinedAsync(User user, int offset = 0, int limit = 50, RecipeSortEnum sort = RecipeSortEnum.ByPostDate, bool asc = false)
+    {
+        if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset should be greater than or equal to 0.");
+        if (limit < 1) throw new ArgumentOutOfRangeException(nameof(limit), "Limit should be greater than or equal to 1.");
+
+        return await getRecipeSort(sort, asc)
+            .Include(i => i.Subfooddit.Users)
+            .Where(i => i.Subfooddit.Users.Contains(user))
             .Skip(offset)
             .Take(limit)
             .ToListAsync();
@@ -54,24 +87,24 @@ public class RecipeRepository : IRecipeRepository
         return await _context.Recipes.FindAsync(id);
     }
 
-    public async Task<List<Recipe>> GetRecipesByUserId(int userId, int offset = 0, int limit = 10)
+    public async Task<List<Recipe>> GetRecipesByUserId(int userId, int offset = 0, int limit = 10, RecipeSortEnum sort = RecipeSortEnum.ByPostDate, bool asc = false)
     {
         if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset should be greater than or equal to 0.");
         if (limit < 1) throw new ArgumentOutOfRangeException(nameof(limit), "Limit should be greater than or equal to 1.");
 
-        return await _context.Recipes
+        return await getRecipeSort(sort, asc)
             .Where(r => r.UserId == userId)
             .Skip(offset)
             .Take(limit)
             .ToListAsync();
     }
 
-    public async Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId, int offset = 0, int limit = 10)
+    public async Task<List<Recipe>> GetRecipesBySubfoodditId(int subfoodditId, int offset = 0, int limit = 10, RecipeSortEnum sort = RecipeSortEnum.ByPostDate, bool asc = false)
     {
         if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset should be greater than or equal to 0.");
         if (limit < 1) throw new ArgumentOutOfRangeException(nameof(limit), "Limit should be greater than or equal to 1.");
 
-        return await _context.Recipes
+        return await getRecipeSort(sort, asc) 
             .Where(r => r.SubfoodditId == subfoodditId)
             .Skip(offset)
             .Take(limit)
