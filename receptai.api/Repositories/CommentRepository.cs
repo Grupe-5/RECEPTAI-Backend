@@ -60,6 +60,13 @@ public class CommentRepository : ICommentRepository
             .ToListAsync();
     }
 
+    public async Task<int> GetCommentCountByRecipeId(int recipeId)
+    {
+        return await _context.Comments
+            .Where(c => c.RecipeId == recipeId)
+            .CountAsync();
+    }
+
     public async Task<Comment?> UpdateAsync(int id,
         UpdateCommentRequestDto commentDto)
     {

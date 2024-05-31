@@ -9,6 +9,8 @@ public interface ICommentRepository
 
     Task<List<Comment>> GetCommentsByRecipeId(int recipeId);
 
+    Task<int> GetCommentCountByRecipeId(int recipeId);
+
     Task<Comment?> GetByIdAsync(int id);
 
     Task<Comment> CreateAsync(Comment commentModel);
