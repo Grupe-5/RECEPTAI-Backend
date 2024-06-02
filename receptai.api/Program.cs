@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using receptai.api;
@@ -97,6 +99,19 @@ builder.Services.Decorate<IImageRepository, CachedImageRepository>();
 
 builder.Services.AddLogging();
 
+// builder.WebHost.ConfigureKestrel((context, options) => {
+//     options.ListenAnyIP(5169, listenOptions => {
+//         listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+//         listenOptions.UseHttps();
+//     });
+// });
+
+bool serveFrontend = builder.Configuration.GetValue<bool?>("ServeFrontend:Enable") ?? false;
+
+if (serveFrontend) {
+    builder.Services.AddControllersWithViews();
+}
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -108,6 +123,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+if (serveFrontend) {
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+        RequestPath = ""
+    });
+    app.UseRouting();
+}
+
 app.UseMiddleware<LoggingMiddleware>();
 
 app.UseCors(x => x
@@ -118,6 +143,12 @@ app.UseCors(x => x
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+if (serveFrontend) {
+    app.MapControllerRoute(name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+    app.MapFallbackToController("Index", "Home");
+}
 
 app.MapControllers();
 
