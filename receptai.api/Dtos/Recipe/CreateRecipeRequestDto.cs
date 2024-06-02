@@ -14,6 +14,8 @@ public class CreateRecipeRequestDto
     public IFormFile? Photo { get; set; }
 
     [Required]
+    [MaxLength(2000, ErrorMessage = "Instructions can't be longer than 2000 characters!")]
+    [MaxNewlineCount(30, ErrorMessage = "Too many points in ingredient list")]
     public string Ingredients { get; set; } = null!;
 
     public string? CookingTime { get; set; } = null!;
@@ -27,5 +29,7 @@ public class CreateRecipeRequestDto
     public int CookingDifficulty { get; set; }
 
     [Required]
+    [MaxLength(2000, ErrorMessage = "Instructions can't be longer than 2000 characters!")]
+    [MaxNewlineCount(30, ErrorMessage = "Too many points in instruction list")]
     public string? Instructions { get; set; } = null!;
 }
