@@ -1,4 +1,4 @@
-@receptai.api_HostAddress = http://localhost:5169
+@receptai.api_HostAddress = https://localhost:5169
 
 GET {{receptai.api_HostAddress}}/weatherforecast/
 Accept: application/json

@@ -1,0 +1,84 @@
+name: .NET publish workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+# Remove this later ^ (on pr)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.x'  # Specify the version of .NET Core SDK
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Publish
+      run: dotnet publish -c Release -o out
+
+    - name: Install EF tool
+      run: dotnet tool install --global dotnet-ef --version 8.*
+
+    - name: DB migration
+      run: dotnet ef database update --startup-project receptai.api --project receptai.data
+    
+    - name: Copy over DB
+      run: cp ./receptai.api/sqlite.db ./out/
+
+    - name: Checkout Angular frontend
+      run: git clone https://github.com/Grupe-5/RECEPTAI-Frontend.git frontend
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    - name: Install Angular CLI
+      run: npm install -g @angular/cli
+
+    - name: Install dependencies for Angular
+      run: npm install
+      working-directory: ./frontend
+
+    - name: Build Angular project
+      run: ng build --configuration=production
+      working-directory: ./frontend
+
+    - name: Make frontend dir
+      run: mkdir ./out/wwwroot
+
+    - name: Copy Angular build artifacts to ASP.NET project
+      run: cp -r ./frontend/dist/recipe-system-frontend/browser/* ./out/wwwroot/
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to GitHub Container Registry
+      run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: PrepareReg Names
+      run: |
+        echo IMAGE_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./out
+        file: ./Dockerfile
+        tags: ghcr.io/${{ env.IMAGE_REPOSITORY }}/recipe-backend:latest
+        push: true
